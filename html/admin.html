@@ -12,6 +12,26 @@
 </head>
 <body>
 
+<!-- ── Early auth guard: redirect if no valid 24h session ── -->
+<script>
+(function() {
+  const ts = localStorage.getItem('admin_auth_ts');
+  const valid = ts && (Date.now() - parseInt(ts, 10)) < (24 * 60 * 60 * 1000);
+  const hasPin = !!localStorage.getItem('admin_pin_hash');
+  // If they have no PIN set at all — first-time setup, allow through
+  // If they have PIN but session expired — show the auth overlay (handled by initAdmin)
+  // We do NOT hard-redirect here so the overlay shows normally
+  // But we DO block direct access when PIN exists and session is invalid by hiding main content
+  if (hasPin && !valid) {
+    // The overlay will cover everything; just ensure main stays hidden until auth
+    document.addEventListener('DOMContentLoaded', function() {
+      const main = document.querySelector('main');
+      if (main) main.style.visibility = 'hidden';
+    });
+  }
+})();
+</script>
+
 <!-- ── Auth Overlay ───────────────────────────────── -->
 <div class="auth-overlay" id="auth-overlay">
   <div class="auth-card" id="auth-card">

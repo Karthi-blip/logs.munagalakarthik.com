@@ -1,14 +1,29 @@
-const REPO   = 'Karthi-blip/logs.munagalakarthik.com';
-const BRANCH = 'main';
-const API    = 'https://api.github.com';
+/* ── Session helpers (24-hour expiry) ───────────── */
+const SESSION_KEY    = 'admin_auth_ts';
+const SESSION_HOURS  = 24;
+
+function isSessionValid() {
+  const ts = localStorage.getItem(SESSION_KEY);
+  if (!ts) return false;
+  return (Date.now() - parseInt(ts, 10)) < (SESSION_HOURS * 60 * 60 * 1000);
+}
+
+function startSession() {
+  localStorage.setItem(SESSION_KEY, Date.now().toString());
+}
+
+function clearSession() {
+  localStorage.removeItem(SESSION_KEY);
+}
 
 /* ── Init ────────────────────────────────────────── */
 function initAdmin() {
-  // already authenticated this browser session
-  if (sessionStorage.getItem('admin_auth') === '1') {
+  // valid 24-hour session — let them in directly
+  if (isSessionValid()) {
     hideOverlay();
     return;
   }
+  // expired or no session — force auth
   const hash = localStorage.getItem('admin_pin_hash');
   if (hash) {
     // returning user — show login
@@ -52,26 +67,24 @@ async function verifyPin() {
   const out = document.getElementById('terminal-output');
   out.innerHTML = '';
 
-  await typeLine(out, '$ sudo admin --login',      'var(--accent)');
-  await sleep(350);
-  await typeLine(out, '> Verifying PIN...',         '#c9d1d9');
-  await sleep(450);
-  await typeLine(out, '> Checking credentials...',  '#c9d1d9');
-  await sleep(350);
+  await typeLine(out, '$ sudo admin --login', 'var(--accent)', 14);
+  await sleep(200);
+  await typeLine(out, '> Verifying PIN...',  '#c9d1d9', 12);
+  await sleep(250);
 
   const match = (await sha256(pin)) === localStorage.getItem('admin_pin_hash');
 
   if (match) {
-    await typeLine(out, '✓ PIN accepted',     'var(--accent)');
-    await sleep(200);
-    await typeLine(out, '✓ Welcome, Karthik', 'var(--accent)');
-    await sleep(650);
-    sessionStorage.setItem('admin_auth', '1');
+    await typeLine(out, '✓ Access granted', 'var(--accent)', 12);
+    await sleep(150);
+    await typeLine(out, '✓ Welcome, Karthik', 'var(--accent)', 12);
+    await sleep(400);
+    startSession();
     hideOverlay();
     showToast('Welcome back ✓', 'success');
   } else {
-    await typeLine(out, '✗ Incorrect PIN — access denied', 'var(--danger)');
-    await sleep(1400);
+    await typeLine(out, '✗ Incorrect PIN — access denied', 'var(--danger)', 12);
+    await sleep(900);
     document.getElementById('auth-terminal').style.display = 'none';
     document.getElementById('login-screen').style.display  = 'block';
     document.getElementById('pin-input').value = '';
@@ -113,7 +126,7 @@ async function changePinSubmit() {
 
 /* ── Logout ──────────────────────────────────────── */
 function logout() {
-  sessionStorage.removeItem('admin_auth');
+  clearSession();
   location.reload();
 }
 
@@ -137,6 +150,9 @@ async function typeLine(container, text, color = '#c9d1d9', speed = 18) {
 function hideOverlay() {
   const el = document.getElementById('auth-overlay');
   if (el) el.style.display = 'none';
+  // Restore main visibility in case it was hidden by guard
+  const main = document.querySelector('main');
+  if (main) main.style.visibility = 'visible';
 }
 
 /* ── Slug / Preview ──────────────────────────────── */
@@ -162,14 +178,8 @@ function togglePreview() {
   }
 }
 
-/* ── Publish ─────────────────────────────────────── */
+/* ── Publish (no GitHub PAT required) ───────────── */
 async function publishPost() {
-  const token = localStorage.getItem('gh_token');
-  if (!token) {
-    showToast('GitHub token not set. Add it in Settings.', 'error');
-    return;
-  }
-
   const title   = document.getElementById('post-title').value.trim();
   const slug    = document.getElementById('post-slug').value.trim();
   const date    = document.getElementById('post-date').value;
@@ -188,22 +198,34 @@ async function publishPost() {
 
   const btn = document.getElementById('publish-btn');
   btn.disabled = true;
-  btn.textContent = 'Publishing...';
+  btn.innerHTML = `<span style="opacity:0.7">Publishing...</span>`;
 
   try {
-    await githubPut(`html/posts/${slug}.json`, JSON.stringify(postData, null, 2), `add post: ${title}`);
+    // ── 1. Save individual post file ──────────────────
+    saveFile(`posts/${slug}.json`, JSON.stringify(postData, null, 2));
+    await sleep(300);
 
-    const existing = await githubGetJson('html/posts.json');
-    const updated  = [
+    // ── 2. Read existing posts index from localStorage ─
+    let existingPosts = [];
+    try {
+      const stored = localStorage.getItem('posts_index');
+      existingPosts = stored ? JSON.parse(stored) : [];
+    } catch (_) { existingPosts = []; }
+
+    const updated = [
       { slug, title, date, tags, excerpt, readTime },
-      ...(existing.posts || []).filter(p => p.slug !== slug)
+      ...existingPosts.filter(p => p.slug !== slug)
     ];
-    await githubPut('html/posts.json', JSON.stringify({ posts: updated }, null, 2), `update index: ${title}`);
+    localStorage.setItem('posts_index', JSON.stringify(updated));
 
-    showToast('Published! Deploying in ~60s ✓', 'success');
+    // ── 3. Download updated posts.json for deployment ──
+    await sleep(200);
+    saveFile('posts.json', JSON.stringify({ posts: updated }, null, 2));
+
+    showToast('Published ✓ — replace posts.json on server', 'success');
     setTimeout(() => {
-      if (confirm('Post published. Go to homepage?')) location.href = 'index.html';
-    }, 1500);
+      if (confirm('Post files downloaded. Go to homepage?')) location.href = 'index.html';
+    }, 1200);
 
   } catch (e) {
     showToast('Error: ' + e.message, 'error');
@@ -213,40 +235,19 @@ async function publishPost() {
   }
 }
 
-/* ── GitHub API helpers ──────────────────────────── */
-async function githubPut(path, content, message) {
-  const token = localStorage.getItem('gh_token');
-  const sha   = await githubFileSha(path);
-  const body  = { message, content: b64encode(content), branch: BRANCH };
-  if (sha) body.sha = sha;
-
-  const res = await fetch(`${API}/repos/${REPO}/contents/${path}`, {
-    method: 'PUT',
-    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-  if (!res.ok) { const e = await res.json(); throw new Error(e.message || `GitHub API ${res.status}`); }
-  return res.json();
+/* ── File download helper ────────────────────────── */
+function saveFile(filename, content) {
+  const blob = new Blob([content], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = filename.split('/').pop();
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
-async function githubFileSha(path) {
-  const token = localStorage.getItem('gh_token');
-  const res   = await fetch(`${API}/repos/${REPO}/contents/${path}?ref=${BRANCH}`, {
-    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
-  });
-  if (res.status === 404) return null;
-  return (await res.json()).sha || null;
-}
-
-async function githubGetJson(path) {
-  const token = localStorage.getItem('gh_token');
-  const res   = await fetch(`${API}/repos/${REPO}/contents/${path}?ref=${BRANCH}`, {
-    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
-  });
-  if (res.status === 404) return { posts: [] };
-  const data = await res.json();
-  return JSON.parse(atob(data.content.replace(/\n/g, '')));
-}
 
 /* ── Utilities ───────────────────────────────────── */
 function slugify(str) {
@@ -269,5 +270,5 @@ function showToast(msg, type = 'success') {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.className = `toast ${type} visible`;
-  setTimeout(() => { t.className = 'toast'; }, 4000);
+  setTimeout(() => { t.className = 'toast'; }, 3000);
 }

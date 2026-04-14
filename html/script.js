@@ -122,3 +122,19 @@ function estimateReadTime(content) {
   const words = (content || '').trim().split(/\s+/).length;
   return Math.max(1, Math.round(words / 200));
 }
+
+/* ── Visitor tracking ──────────────────────────────── */
+function trackAndShowVisitors() {
+  // Increment visit count (stored in localStorage)
+  const key = 'site_visit_count';
+  let count = parseInt(localStorage.getItem(key) || '0', 10) + 1;
+  localStorage.setItem(key, count.toString());
+
+  const fmt = count.toLocaleString('en-IN');
+
+  const sidebarEl = document.getElementById('visitor-count');
+  if (sidebarEl) sidebarEl.textContent = fmt;
+
+  const footerEl = document.getElementById('footer-visit-count');
+  if (footerEl) footerEl.textContent = fmt;
+}

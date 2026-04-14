@@ -497,3 +497,41 @@ textarea.code-editor {
   .form-row { grid-template-columns: 1fr; }
   .post-title { font-size: 1.5rem; }
 }
+
+/* ── Site Footer ─────────────────────────────────── */
+.site-footer {
+  margin-top: 4rem;
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.site-footer a { color: var(--muted); transition: color 0.15s; }
+.site-footer a:hover { color: var(--accent); text-decoration: none; }
+.footer-dot { opacity: 0.4; }
+
+/* ── Sidebar Visitors ────────────────────────────── */
+.sidebar-visitors {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+}
+.visitors-label {
+  font-size: 0.68rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 2px;
+}
+.visitors-count {
+  font-size: 1rem;
+  color: var(--accent);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}

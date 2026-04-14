@@ -72,6 +72,11 @@
     <div class="time" id="clock">--:--:--</div>
   </div>
 
+  <div class="sidebar-visitors">
+    <div class="visitors-label">VISITORS</div>
+    <div class="visitors-count" id="visitor-count">—</div>
+  </div>
+
   <div class="sidebar-footer">
     <a href="admin.html" class="admin-link">
       <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,12 +99,24 @@
       <h3>Loading posts...</h3>
     </div>
   </div>
+
+  <footer class="site-footer">
+    <span>© 2026 <a href="https://munagalakarthik.com" target="_blank" rel="noopener">Munagala Karthik</a></span>
+    <span class="footer-dot">·</span>
+    <span>All rights reserved</span>
+    <span class="footer-dot">·</span>
+    <span id="footer-visitors" style="display:inline-flex;align-items:center;gap:0.3rem;">
+      <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+      <span id="footer-visit-count">—</span> visits
+    </span>
+  </footer>
 </main>
 
 <script src="script.js"></script>
 <script>
   startClock();
   loadPosts();
+  trackAndShowVisitors();
 </script>
 </body>
 </html>
