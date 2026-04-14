@@ -464,8 +464,12 @@ textarea.code-editor {
   padding: 0.75rem 1.25rem;
   font-size: 0.875rem;
   z-index: 9999;
-  animation: slideUp 0.2s ease;
   max-width: 340px;
+  display: none;
+}
+.toast.visible {
+  display: block;
+  animation: slideUp 0.2s ease;
 }
 .toast.success { border-color: var(--accent); color: var(--accent); }
 .toast.error   { border-color: var(--danger); color: var(--danger); }
@@ -501,7 +505,7 @@ textarea.code-editor {
 /* ── Site Footer ─────────────────────────────────── */
 .site-footer {
   position: fixed;
-  bottom: 0;
+  bottom: 28px;
   left: var(--sidebar-w);
   right: 0;
   padding: 0.65rem 1rem;
@@ -539,4 +543,30 @@ textarea.code-editor {
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.04em;
+}
+
+/* ── Bottom Status Bar (portfolio-style) ─────────── */
+.status-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 28px;
+  background: var(--sidebar-bg);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  gap: 1.5rem;
+  z-index: 200;
+  font-size: 0.68rem;
+  font-family: 'Fira Code', 'Cascadia Code', monospace;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.sb-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
 }

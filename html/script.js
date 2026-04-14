@@ -1,12 +1,16 @@
-/* ── Clock ──────────────────────────────────────────── */
+/* ── Clock ────────────────────────────────────────── */
 function startClock() {
   function tick() {
-    const el = document.getElementById('clock');
-    if (!el) return;
     const ist = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-    el.textContent = ist.toLocaleTimeString('en-IN', {
+    const timeStr = ist.toLocaleTimeString('en-IN', {
       hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
     });
+    // Sidebar clock
+    const el = document.getElementById('clock');
+    if (el) el.textContent = timeStr;
+    // Status bar clock
+    const sb = document.getElementById('status-clock');
+    if (sb) sb.textContent = timeStr + ' IST';
   }
   tick();
   setInterval(tick, 1000);
