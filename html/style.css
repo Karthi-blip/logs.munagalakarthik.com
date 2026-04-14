@@ -505,13 +505,14 @@ textarea.code-editor {
   border-top: 1px solid var(--border);
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.6rem;
   flex-wrap: wrap;
   font-size: 0.78rem;
-  color: var(--muted);
+  color: var(--accent);
 }
-.site-footer a { color: var(--muted); transition: color 0.15s; }
-.site-footer a:hover { color: var(--accent); text-decoration: none; }
+.site-footer a { color: var(--accent); transition: color 0.15s; }
+.site-footer a:hover { color: var(--accent-hover); text-decoration: none; }
 .footer-dot { opacity: 0.4; }
 
 /* ── Sidebar Visitors ────────────────────────────── */
