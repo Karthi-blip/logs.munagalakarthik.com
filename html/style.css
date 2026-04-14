@@ -1,3 +1,23 @@
+/* ── Boot Screen ─────────────────────────────────── */
+#boot-screen {
+  position: fixed;
+  inset: 0;
+  background: #0d1117;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.6s ease;
+}
+.boot-text {
+  font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.9;
+  color: #00d4ff;
+  max-width: 520px;
+  width: 90%;
+}
+
 /* ── Reset & Variables ─────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 

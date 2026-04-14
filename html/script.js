@@ -1,3 +1,47 @@
+/* ── Boot Screen ──────────────────────────────────── */
+(function () {
+  const bootScreen = document.getElementById('boot-screen');
+  const bootText   = document.getElementById('boot-text');
+  if (!bootScreen || !bootText) return;
+
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (prefersReduced) {
+    bootScreen.style.display = 'none';
+    return;
+  }
+
+  document.body.style.overflow = 'hidden';
+
+  const lines = [
+    "INIT: logs.munagalakarthik.com booting...",
+    "[ <span style='color:#3fb950'>OK</span> ] Mounting filesystem...",
+    "Loading security modules... <span style='color:#8b949e'>[proxy]</span>",
+    "[ <span style='color:#e3b341'>WARN</span> ] Unauthorized access attempt logged (IP: 192.x.x.x)",
+    "Decrypting payload [logs.munagalakarthik.com]... <span style='color:#3fb950'>Success</span>",
+    "Establishing secure channel...",
+    "[ <span style='color:#3fb950'>OK</span> ] System ready. Loading posts..."
+  ];
+
+  let idx = 0;
+  function addLine() {
+    if (idx < lines.length) {
+      bootText.innerHTML += lines[idx] + '<br>';
+      idx++;
+      setTimeout(addLine, Math.random() * 150 + 80);
+    } else {
+      setTimeout(() => {
+        bootScreen.style.opacity = '0';
+        setTimeout(() => {
+          bootScreen.style.display = 'none';
+          document.body.style.overflow = '';
+        }, 600);
+      }, 1200);
+    }
+  }
+  setTimeout(addLine, 200);
+})();
+
 /* ── Clock ────────────────────────────────────────── */
 function startClock() {
   function tick() {
