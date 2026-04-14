@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — logs</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+</head>
+<body>
+
+<!-- ── Auth Overlay ───────────────────────────────── -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-card">
+    <h2>Admin Access</h2>
+    <p>Enter your GitHub Personal Access Token to continue.<br>
+       Token needs <code style="font-size:0.8rem;background:#0d1117;padding:1px 5px;border-radius:3px;border:1px solid #30363d">repo</code> scope on <code style="font-size:0.8rem;background:#0d1117;padding:1px 5px;border-radius:3px;border:1px solid #30363d">Karthi-blip/logs.munagalakarthik.com</code>.</p>
+    <div class="form-group">
+      <label>GitHub Token</label>
+      <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+    </div>
+    <div id="auth-error" style="color:var(--danger);font-size:0.82rem;margin-bottom:0.75rem;display:none;"></div>
+    <button class="btn btn-primary" id="auth-btn" onclick="verifyToken()" style="width:100%">
+      Verify & Enter
+    </button>
+  </div>
+</div>
+
+<!-- ── Sidebar ─────────────────────────────────────── -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="name"><span>Karthik</span></div>
+    <div class="role">Cloud Security Engineer</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <span class="sidebar-section-label">Navigation</span>
+    <a href="index.html">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+      </svg>
+      Home
+    </a>
+    <a href="admin.html" class="active">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+      </svg>
+      Admin
+    </a>
+  </div>
+
+  <div class="sidebar-clock">
+    <div class="label">IST</div>
+    <div class="time" id="clock">--:--:--</div>
+  </div>
+
+  <div class="sidebar-footer">
+    <button class="btn btn-danger" onclick="logout()" style="width:100%;justify-content:center;font-size:0.8rem;">
+      <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+      </svg>
+      Sign out
+    </button>
+  </div>
+</nav>
+
+<!-- ── Admin Panel ─────────────────────────────────── -->
+<main class="main">
+  <div class="admin-header">
+    <h1>New Post</h1>
+    <div class="admin-toolbar">
+      <button class="btn btn-secondary" onclick="togglePreview()" id="preview-btn">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+        </svg>
+        Preview
+      </button>
+      <button class="btn btn-primary" onclick="publishPost()" id="publish-btn">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+        </svg>
+        Publish
+      </button>
+    </div>
+  </div>
+
+  <div class="form-row" style="margin-bottom:1rem;">
+    <div class="form-group">
+      <label>Title *</label>
+      <input type="text" id="post-title" placeholder="My post title" oninput="updateSlug()">
+    </div>
+    <div class="form-group">
+      <label>Date *</label>
+      <input type="date" id="post-date">
+    </div>
+  </div>
+
+  <div class="form-row" style="margin-bottom:1rem;">
+    <div class="form-group">
+      <label>Slug (auto-generated)</label>
+      <input type="text" id="post-slug" placeholder="my-post-title">
+    </div>
+    <div class="form-group">
+      <label>Tags (comma separated)</label>
+      <input type="text" id="post-tags" placeholder="aws, iam, security">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Content (Markdown) *</label>
+    <textarea id="post-content" class="code-editor" placeholder="Write your post in markdown..."></textarea>
+  </div>
+
+  <div class="preview-panel" id="preview-panel">
+    <h3>Preview</h3>
+    <div id="preview-content" class="post-content"></div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="script.js"></script>
+<script src="admin.js"></script>
+<script>
+  startClock();
+  initAdmin();
+  // set today's date as default
+  document.getElementById('post-date').value = new Date().toISOString().split('T')[0];
+</script>
+</body>
+</html>

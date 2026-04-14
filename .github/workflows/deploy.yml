@@ -11,24 +11,12 @@ permissions:
 
 jobs:
   deploy:
-    name: Build Hugo + Deploy to S3 + Invalidate CloudFront
+    name: Deploy to S3 + Invalidate CloudFront
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          submodules: true
-          fetch-depth: 0
-
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v3
-        with:
-          hugo-version: "latest"
-          extended: true
-
-      - name: Build site
-        run: hugo --minify
 
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
@@ -46,28 +34,20 @@ jobs:
           echo "S3_BUCKET_NAME=$(echo $SECRET | jq -r '.S3_BUCKET_NAME')" >> $GITHUB_ENV
           echo "CLOUDFRONT_DISTRIBUTION_ID=$(echo $SECRET | jq -r '.CLOUDFRONT_DISTRIBUTION_ID')" >> $GITHUB_ENV
 
-      - name: Deploy HTML to S3
+      - name: Deploy HTML & JSON to S3 (no-cache)
         run: |
-          aws s3 sync public/ s3://${{ env.S3_BUCKET_NAME }}/ \
+          aws s3 sync html/ s3://${{ env.S3_BUCKET_NAME }}/ \
             --delete \
             --exclude "*.css" \
             --exclude "*.js" \
-            --exclude "*.png" \
-            --exclude "*.jpg" \
-            --exclude "*.webp" \
-            --exclude "*.woff*" \
-            --cache-control "no-cache"
+            --cache-control "no-cache, no-store, must-revalidate"
 
-      - name: Deploy static assets to S3
+      - name: Deploy CSS & JS to S3 (long-cache)
         run: |
-          aws s3 sync public/ s3://${{ env.S3_BUCKET_NAME }}/ \
+          aws s3 sync html/ s3://${{ env.S3_BUCKET_NAME }}/ \
             --exclude "*" \
             --include "*.css" \
             --include "*.js" \
-            --include "*.png" \
-            --include "*.jpg" \
-            --include "*.webp" \
-            --include "*.woff*" \
             --cache-control "max-age=31536000,immutable"
 
       - name: Invalidate CloudFront cache
