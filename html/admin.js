@@ -15,30 +15,79 @@ function initAdmin() {
 
 async function verifyToken() {
   const input = document.getElementById('token-input');
-  const btn   = document.getElementById('auth-btn');
   const err   = document.getElementById('auth-error');
   const token = input.value.trim();
 
   if (!token) { showErr(err, 'Please enter a token.'); return; }
-
-  btn.textContent = 'Verifying...';
-  btn.disabled = true;
   err.style.display = 'none';
 
+  // switch to terminal view
+  document.getElementById('auth-form').style.display     = 'none';
+  document.getElementById('auth-terminal').style.display = 'block';
+
+  const out = document.getElementById('terminal-output');
+  out.innerHTML = '';
+
+  // kick off API call in parallel while terminal types
+  const apiCall = fetch(`${API}/repos/${REPO}`, {
+    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+  });
+
+  const lines = [
+    { text: `$ github-auth --verify`,                      color: 'var(--accent)', delay: 0   },
+    { text: `> Connecting to api.github.com...`,            color: '#c9d1d9',       delay: 400 },
+    { text: `> Verifying token...`,                         color: '#c9d1d9',       delay: 900 },
+    { text: `> Checking repository access...`,              color: '#c9d1d9',       delay: 1400 },
+  ];
+
+  for (const line of lines) {
+    await sleep(line.delay === 0 ? 0 : line.delay - (lines[lines.indexOf(line) - 1]?.delay ?? 0));
+    await typeLine(out, line.text, line.color);
+  }
+
+  // wait for API
   try {
-    const res = await fetch(`${API}/repos/${REPO}`, {
-      headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
-    });
-    if (!res.ok) throw new Error('Invalid token or no access to repo.');
+    const res = await apiCall;
+    if (!res.ok) throw new Error('Invalid token or no repo access.');
+
+    await sleep(300);
+    await typeLine(out, `✓ Token valid`,              'var(--accent)');
+    await sleep(200);
+    await typeLine(out, `✓ Repository access confirmed`, 'var(--accent)');
+    await sleep(200);
+    await typeLine(out, `✓ Welcome, Karthik`,         'var(--accent)');
+    await sleep(700);
 
     localStorage.setItem('gh_token', token);
     hideOverlay();
     showToast('Authenticated ✓', 'success');
+
   } catch (e) {
+    await sleep(300);
+    await typeLine(out, `✗ ${e.message}`, 'var(--danger)');
+    await sleep(1200);
+    // go back to form
+    document.getElementById('auth-terminal').style.display = 'none';
+    document.getElementById('auth-form').style.display     = 'block';
     showErr(err, e.message);
-    btn.textContent = 'Verify & Enter';
-    btn.disabled = false;
   }
+}
+
+/* ── Terminal helpers ────────────────────────────── */
+function sleep(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+
+async function typeLine(container, text, color = '#c9d1d9', speed = 18) {
+  const span = document.createElement('div');
+  span.style.color = color;
+  container.appendChild(span);
+
+  for (const ch of text) {
+    span.textContent += ch;
+    await sleep(speed);
+  }
+  await sleep(60);
 }
 
 function hideOverlay() {

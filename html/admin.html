@@ -14,18 +14,51 @@
 
 <!-- ── Auth Overlay ───────────────────────────────── -->
 <div class="auth-overlay" id="auth-overlay">
-  <div class="auth-card">
-    <h2>Admin Access</h2>
-    <p>Enter your GitHub Personal Access Token to continue.<br>
-       Token needs <code style="font-size:0.8rem;background:#0d1117;padding:1px 5px;border-radius:3px;border:1px solid #30363d">repo</code> scope on <code style="font-size:0.8rem;background:#0d1117;padding:1px 5px;border-radius:3px;border:1px solid #30363d">Karthi-blip/logs.munagalakarthik.com</code>.</p>
-    <div class="form-group">
-      <label>GitHub Token</label>
-      <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
-    </div>
-    <div id="auth-error" style="color:var(--danger);font-size:0.82rem;margin-bottom:0.75rem;display:none;"></div>
-    <button class="btn btn-primary" id="auth-btn" onclick="verifyToken()" style="width:100%">
-      Verify & Enter
+  <div class="auth-card" id="auth-card">
+
+    <!-- Close button -->
+    <button onclick="location.href='index.html'" style="
+      position:absolute;top:1rem;right:1rem;
+      background:none;border:none;cursor:pointer;
+      color:var(--muted);padding:4px;border-radius:4px;
+      line-height:1;transition:color 0.15s;
+    " onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'" title="Go back">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
     </button>
+
+    <!-- Token form (shown by default) -->
+    <div id="auth-form">
+      <h2>Admin Access</h2>
+      <p>Please enter your GitHub token to continue.</p>
+      <div class="form-group">
+        <label>GitHub Token</label>
+        <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+      </div>
+      <div id="auth-error" style="color:var(--danger);font-size:0.82rem;margin-bottom:0.75rem;display:none;"></div>
+      <button class="btn btn-primary" id="auth-btn" onclick="verifyToken()" style="width:100%">
+        Verify & Enter
+      </button>
+    </div>
+
+    <!-- Terminal (shown during verification) -->
+    <div id="auth-terminal" style="display:none;">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:1rem;">
+        <span style="width:12px;height:12px;border-radius:50%;background:#f85149;display:inline-block;"></span>
+        <span style="width:12px;height:12px;border-radius:50%;background:#e3b341;display:inline-block;"></span>
+        <span style="width:12px;height:12px;border-radius:50%;background:#3fb950;display:inline-block;"></span>
+        <span style="font-size:0.72rem;color:var(--muted);margin-left:4px;">auth — bash</span>
+      </div>
+      <div id="terminal-output" style="
+        font-family:'Fira Code','Cascadia Code',monospace;
+        font-size:0.82rem;
+        line-height:1.8;
+        color:#c9d1d9;
+        min-height:120px;
+      "></div>
+    </div>
+
   </div>
 </div>
 
