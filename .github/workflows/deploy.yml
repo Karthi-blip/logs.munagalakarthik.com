@@ -37,9 +37,18 @@ jobs:
           role-session-name: github-actions-logs-deploy
           aws-region: us-east-1
 
+      - name: Fetch deploy config from Secrets Manager
+        run: |
+          SECRET=$(aws secretsmanager get-secret-value \
+            --secret-id "logs/deploy-config" \
+            --query SecretString \
+            --output text)
+          echo "S3_BUCKET_NAME=$(echo $SECRET | jq -r '.S3_BUCKET_NAME')" >> $GITHUB_ENV
+          echo "CLOUDFRONT_DISTRIBUTION_ID=$(echo $SECRET | jq -r '.CLOUDFRONT_DISTRIBUTION_ID')" >> $GITHUB_ENV
+
       - name: Deploy HTML to S3
         run: |
-          aws s3 sync public/ s3://${{ secrets.S3_BUCKET_NAME }}/ \
+          aws s3 sync public/ s3://${{ env.S3_BUCKET_NAME }}/ \
             --delete \
             --exclude "*.css" \
             --exclude "*.js" \
@@ -51,7 +60,7 @@ jobs:
 
       - name: Deploy static assets to S3
         run: |
-          aws s3 sync public/ s3://${{ secrets.S3_BUCKET_NAME }}/ \
+          aws s3 sync public/ s3://${{ env.S3_BUCKET_NAME }}/ \
             --exclude "*" \
             --include "*.css" \
             --include "*.js" \
@@ -64,7 +73,7 @@ jobs:
       - name: Invalidate CloudFront cache
         run: |
           aws cloudfront create-invalidation \
-            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --distribution-id ${{ env.CLOUDFRONT_DISTRIBUTION_ID }} \
             --paths "/*"
 
       - name: Done

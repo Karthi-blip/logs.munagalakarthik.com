@@ -16,7 +16,7 @@ CDN + HTTPS     → AWS CloudFront        (free tier)
 SSL Certificate → AWS ACM               (free)
 Blog Engine     → Hugo (static)         (free)
 CI/CD           → GitHub Actions        (free)
-──────────────────────────────────────────────
+──────────────────────────────────────────────-
 Total Cost      →                       ~$0/year (infra shared)
 ```
 

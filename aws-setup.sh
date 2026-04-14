@@ -230,6 +230,23 @@ aws route53 change-resource-record-sets \
 echo "✅ DNS record created: logs.munagalakarthik.com → $CF_DOMAIN"
 
 # ─────────────────────────────────────────────
+# STEP 6 — Secrets Manager: store deploy config
+# ─────────────────────────────────────────────
+
+echo ">>> Creating Secrets Manager secret: logs/deploy-config..."
+
+aws secretsmanager create-secret \
+  --name "logs/deploy-config" \
+  --description "Deploy config for logs.munagalakarthik.com GitHub Actions" \
+  --secret-string "{
+    \"S3_BUCKET_NAME\": \"${BUCKET}\",
+    \"CLOUDFRONT_DISTRIBUTION_ID\": \"${CF_DIST_ID}\"
+  }" \
+  --region "$REGION"
+
+echo "✅ Secret created: logs/deploy-config"
+
+# ─────────────────────────────────────────────
 # DONE — Print summary
 # ─────────────────────────────────────────────
 
