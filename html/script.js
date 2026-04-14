@@ -42,6 +42,43 @@
   setTimeout(addLine, 200);
 })();
 
+/* ── Custom Cursor ─────────────────────────────── */
+(function () {
+  const cursor = document.getElementById('cursor');
+  const dot    = document.getElementById('cursor-dot');
+  if (!cursor || !dot) return;
+
+  let mx = innerWidth / 2, my = innerHeight / 2;
+  let cx = mx, cy = my;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    dot.style.left = mx + 'px';
+    dot.style.top  = my + 'px';
+  });
+
+  (function lagCursor() {
+    cx += (mx - cx) * 0.1;
+    cy += (my - cy) * 0.1;
+    cursor.style.left = cx + 'px';
+    cursor.style.top  = cy + 'px';
+    requestAnimationFrame(lagCursor);
+  })();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform    = 'translate(-50%,-50%) scale(2.2)';
+      cursor.style.borderColor  = '#aa66ff';
+      cursor.style.background   = 'rgba(170,102,255,0.08)';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform    = 'translate(-50%,-50%) scale(1)';
+      cursor.style.borderColor  = '#00d4ff';
+      cursor.style.background   = 'transparent';
+    });
+  });
+})();
+
 /* ── Clock ────────────────────────────────────────── */
 function startClock() {
   function tick() {
