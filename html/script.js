@@ -124,46 +124,23 @@ function estimateReadTime(content) {
 }
 
 /* ── Visitor tracking (global, cross-device) ───────── */
-async function trackAndShowVisitors() {
-  const sessionKey = 'site_visit_counted';
-  const NAMESPACE  = 'logs.munagalakarthik.com';
-  const KEY        = 'pageviews';
-  const BASE       = 'https://api.countapi.xyz';
+function trackAndShowVisitors() {
+  const sidebarEl = document.getElementById('visitor-count');
+  const footerEl  = document.getElementById('footer-visit-count');
+  if (!sidebarEl && !footerEl) return;
 
-  try {
-    let count;
-    if (!sessionStorage.getItem(sessionKey)) {
-      // First visit this session → hit (increment) the global counter
-      const res = await fetch(`${BASE}/hit/${NAMESPACE}/${KEY}`);
-      const data = await res.json();
-      count = data.value;
-      sessionStorage.setItem(sessionKey, '1');
-    } else {
-      // Already counted this session → just read the current value
-      const res = await fetch(`${BASE}/get/${NAMESPACE}/${KEY}`);
-      const data = await res.json();
-      count = data.value;
-    }
+  const ctrl    = new AbortController();
+  const timeout = setTimeout(() => ctrl.abort(), 4000);
 
-    const fmt = count.toLocaleString('en-IN');
-    const sidebarEl = document.getElementById('visitor-count');
-    if (sidebarEl) sidebarEl.textContent = fmt;
-    const footerEl = document.getElementById('footer-visit-count');
-    if (footerEl) footerEl.textContent = fmt;
-
-  } catch (_) {
-    // API offline — fall back to localStorage
-    const storageKey = 'site_visit_count';
-    if (!sessionStorage.getItem('site_visit_counted')) {
-      let c = parseInt(localStorage.getItem(storageKey) || '0', 10) + 1;
-      localStorage.setItem(storageKey, c.toString());
-      sessionStorage.setItem('site_visit_counted', '1');
-    }
-    const count = parseInt(localStorage.getItem(storageKey) || '0', 10);
-    const fmt = count.toLocaleString('en-IN');
-    const sidebarEl = document.getElementById('visitor-count');
-    if (sidebarEl) sidebarEl.textContent = fmt;
-    const footerEl = document.getElementById('footer-visit-count');
-    if (footerEl) footerEl.textContent = fmt;
-  }
+  fetch('https://api.counterapi.dev/v1/logs.munagalakarthik.com/visitors/up', { signal: ctrl.signal })
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      clearTimeout(timeout);
+      if (d && typeof d.count === 'number') {
+        const n = Number(d.count).toLocaleString();
+        if (sidebarEl) sidebarEl.textContent = n;
+        if (footerEl)  footerEl.textContent  = n;
+      }
+    })
+    .catch(() => {});
 }
