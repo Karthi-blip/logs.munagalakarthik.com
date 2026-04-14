@@ -125,11 +125,18 @@ function estimateReadTime(content) {
 
 /* ── Visitor tracking ──────────────────────────────── */
 function trackAndShowVisitors() {
-  // Increment visit count (stored in localStorage)
-  const key = 'site_visit_count';
-  let count = parseInt(localStorage.getItem(key) || '0', 10) + 1;
-  localStorage.setItem(key, count.toString());
+  const storageKey = 'site_visit_count';
+  const sessionKey = 'site_visit_counted';
 
+  // Only increment once per browser session (fresh tab/window open)
+  // Refreshing the page will NOT increment again
+  if (!sessionStorage.getItem(sessionKey)) {
+    let count = parseInt(localStorage.getItem(storageKey) || '0', 10) + 1;
+    localStorage.setItem(storageKey, count.toString());
+    sessionStorage.setItem(sessionKey, '1');
+  }
+
+  const count = parseInt(localStorage.getItem(storageKey) || '0', 10);
   const fmt = count.toLocaleString('en-IN');
 
   const sidebarEl = document.getElementById('visitor-count');
