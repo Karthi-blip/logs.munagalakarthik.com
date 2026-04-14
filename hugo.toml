@@ -1,0 +1,42 @@
+baseURL = "https://logs.munagalakarthik.com/"
+languageCode = "en-us"
+title = "logs"
+theme = "terminal"
+paginate = 5
+
+[params]
+  contentTypeName = "posts"
+  themeColor = "green"
+  showMenuItems = 2
+  showLanguageSelector = false
+  fullWidthTheme = false
+  centerTheme = false
+  autoCover = true
+  readingTime = true
+  Subtitle = "cloud security notes & writeups"
+  GitHubCorner = false
+
+[languages]
+  [languages.en.params]
+    title = "logs"
+    subtitle = "cloud security notes & writeups"
+    owner = "Munagala Karthik"
+    keywords = "cloud security, aws, devops, writeups"
+    copyright = ""
+    menuMore = "show more"
+    readMore = "read more"
+    readOtherPosts = "read other posts"
+    newerPosts = "newer posts"
+    olderPosts = "older posts"
+    missingContentMessage = "Page not found..."
+    missingBackButtonLabel = "back to home page"
+
+  [[languages.en.params.menu.main]]
+    identifier = "about"
+    name = "about"
+    url = "/about"
+
+  [[languages.en.params.menu.main]]
+    identifier = "portfolio"
+    name = "portfolio →"
+    url = "https://munagalakarthik.com"

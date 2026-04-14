@@ -1,0 +1,17 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Hugo build output
+public/
+resources/
+.hugo_build.lock
+
+# Private — never commit
+myreadme.md
