@@ -34,21 +34,11 @@ jobs:
           echo "S3_BUCKET_NAME=$(echo $SECRET | jq -r '.S3_BUCKET_NAME')" >> $GITHUB_ENV
           echo "CLOUDFRONT_DISTRIBUTION_ID=$(echo $SECRET | jq -r '.CLOUDFRONT_DISTRIBUTION_ID')" >> $GITHUB_ENV
 
-      - name: Deploy HTML & JSON to S3 (no-cache)
+      - name: Deploy all files to S3
         run: |
           aws s3 sync html/ s3://${{ env.S3_BUCKET_NAME }}/ \
             --delete \
-            --exclude "*.css" \
-            --exclude "*.js" \
             --cache-control "no-cache, no-store, must-revalidate"
-
-      - name: Deploy CSS & JS to S3 (long-cache)
-        run: |
-          aws s3 sync html/ s3://${{ env.S3_BUCKET_NAME }}/ \
-            --exclude "*" \
-            --include "*.css" \
-            --include "*.js" \
-            --cache-control "max-age=31536000,immutable"
 
       - name: Invalidate CloudFront cache
         run: |
