@@ -28,21 +28,35 @@
       </svg>
     </button>
 
-    <!-- Token form (shown by default) -->
-    <div id="auth-form">
-      <h2>Admin Access</h2>
-      <p>Please enter your GitHub token to continue.</p>
+    <!-- First-time setup -->
+    <div id="setup-screen" style="display:none;">
+      <h2>Set up PIN</h2>
+      <p>Create a PIN to protect your admin panel.</p>
       <div class="form-group">
-        <label>GitHub Token</label>
-        <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+        <label>New PIN</label>
+        <input type="password" id="setup-pin" inputmode="numeric" placeholder="Enter PIN" autocomplete="new-password">
       </div>
-      <div id="auth-error" style="color:var(--danger);font-size:0.82rem;margin-bottom:0.75rem;display:none;"></div>
-      <button class="btn btn-primary" id="auth-btn" onclick="verifyToken()" style="width:100%">
-        Verify & Enter
-      </button>
+      <div class="form-group">
+        <label>Confirm PIN</label>
+        <input type="password" id="setup-pin-confirm" inputmode="numeric" placeholder="Confirm PIN" autocomplete="new-password">
+      </div>
+      <div id="setup-error" style="color:var(--danger);font-size:0.82rem;margin-bottom:0.75rem;display:none;"></div>
+      <button class="btn btn-primary" onclick="setupPin()" style="width:100%">Set PIN</button>
     </div>
 
-    <!-- Terminal (shown during verification) -->
+    <!-- Login -->
+    <div id="login-screen" style="display:none;">
+      <h2>Admin Access</h2>
+      <p>Enter your PIN to continue.</p>
+      <div class="form-group">
+        <label>PIN</label>
+        <input type="password" id="pin-input" inputmode="numeric" placeholder="••••••••" autocomplete="current-password" maxlength="32">
+      </div>
+      <div id="auth-error" style="color:var(--danger);font-size:0.82rem;margin-bottom:0.75rem;display:none;"></div>
+      <button class="btn btn-primary" id="auth-btn" onclick="verifyPin()" style="width:100%">Enter</button>
+    </div>
+
+    <!-- Terminal animation -->
     <div id="auth-terminal" style="display:none;">
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:1rem;">
         <span style="width:12px;height:12px;border-radius:50%;background:#f85149;display:inline-block;"></span>
@@ -90,7 +104,13 @@
     <div class="time" id="clock">--:--:--</div>
   </div>
 
-  <div class="sidebar-footer">
+  <div class="sidebar-footer" style="display:flex;flex-direction:column;gap:0.5rem;">
+    <button class="btn btn-secondary" onclick="openChangePin()" style="width:100%;justify-content:center;font-size:0.8rem;">
+      <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+      </svg>
+      Change PIN
+    </button>
     <button class="btn btn-danger" onclick="logout()" style="width:100%;justify-content:center;font-size:0.8rem;">
       <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
@@ -153,6 +173,38 @@
     <div id="preview-content" class="post-content"></div>
   </div>
 </main>
+
+<!-- ── Change PIN Modal ─────────────────────────────── -->
+<div class="auth-overlay" id="change-pin-modal" style="display:none;">
+  <div class="auth-card" style="position:relative;">
+    <button onclick="closeChangePin()" style="
+      position:absolute;top:1rem;right:1rem;
+      background:none;border:none;cursor:pointer;
+      color:var(--muted);padding:4px;border-radius:4px;
+      line-height:1;transition:color 0.15s;
+    " onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+    <h2>Change PIN</h2>
+    <p>Enter your current PIN and choose a new one.</p>
+    <div class="form-group">
+      <label>Current PIN</label>
+      <input type="password" id="current-pin" inputmode="numeric" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div class="form-group">
+      <label>New PIN</label>
+      <input type="password" id="new-pin" inputmode="numeric" placeholder="••••••••" autocomplete="new-password">
+    </div>
+    <div class="form-group">
+      <label>Confirm New PIN</label>
+      <input type="password" id="confirm-new-pin" inputmode="numeric" placeholder="••••••••" autocomplete="new-password">
+    </div>
+    <div id="pin-change-error" style="color:var(--danger);font-size:0.82rem;margin-bottom:0.75rem;display:none;"></div>
+    <button class="btn btn-primary" onclick="changePinSubmit()" style="width:100%">Update PIN</button>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 

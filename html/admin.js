@@ -1,132 +1,174 @@
-const REPO  = 'Karthi-blip/logs.munagalakarthik.com';
+const REPO   = 'Karthi-blip/logs.munagalakarthik.com';
 const BRANCH = 'main';
 const API    = 'https://api.github.com';
 
-/* ── Auth ─────────────────────────────────────────── */
+/* ── Init ────────────────────────────────────────── */
 function initAdmin() {
-  const token = localStorage.getItem('gh_token');
-  if (token) {
+  // already authenticated this browser session
+  if (sessionStorage.getItem('admin_auth') === '1') {
     hideOverlay();
+    return;
   }
-  // allow Enter key on token input
-  const input = document.getElementById('token-input');
-  if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter') verifyToken(); });
+  const hash = localStorage.getItem('admin_pin_hash');
+  if (hash) {
+    // returning user — show login
+    document.getElementById('login-screen').style.display = 'block';
+    const input = document.getElementById('pin-input');
+    if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter') verifyPin(); });
+  } else {
+    // first time — show setup
+    document.getElementById('setup-screen').style.display = 'block';
+    const c = document.getElementById('setup-pin-confirm');
+    if (c) c.addEventListener('keydown', e => { if (e.key === 'Enter') setupPin(); });
+  }
 }
 
-async function verifyToken() {
-  const input = document.getElementById('token-input');
-  const err   = document.getElementById('auth-error');
-  const token = input.value.trim();
-
-  if (!token) { showErr(err, 'Please enter a token.'); return; }
+/* ── First-time PIN setup ────────────────────────── */
+async function setupPin() {
+  const pin    = document.getElementById('setup-pin').value;
+  const confirm = document.getElementById('setup-pin-confirm').value;
+  const err    = document.getElementById('setup-error');
   err.style.display = 'none';
+  if (!pin)            { showErr(err, 'Please enter a PIN.'); return; }
+  if (pin !== confirm) { showErr(err, 'PINs do not match.'); return; }
+  localStorage.setItem('admin_pin_hash', await sha256(pin));
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'block';
+  showToast('PIN set. Please log in.', 'success');
+  document.getElementById('pin-input').focus();
+}
 
-  // switch to terminal view
-  document.getElementById('auth-form').style.display     = 'none';
+/* ── PIN login ───────────────────────────────────── */
+async function verifyPin() {
+  const pin = document.getElementById('pin-input').value;
+  const err = document.getElementById('auth-error');
+  err.style.display = 'none';
+  if (!pin) { showErr(err, 'Please enter your PIN.'); return; }
+
+  // switch to terminal
+  document.getElementById('login-screen').style.display  = 'none';
   document.getElementById('auth-terminal').style.display = 'block';
 
   const out = document.getElementById('terminal-output');
   out.innerHTML = '';
 
-  // kick off API call in parallel while terminal types
-  const apiCall = fetch(`${API}/repos/${REPO}`, {
-    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
-  });
+  await typeLine(out, '$ sudo admin --login',      'var(--accent)');
+  await sleep(350);
+  await typeLine(out, '> Verifying PIN...',         '#c9d1d9');
+  await sleep(450);
+  await typeLine(out, '> Checking credentials...',  '#c9d1d9');
+  await sleep(350);
 
-  const lines = [
-    { text: `$ github-auth --verify`,                      color: 'var(--accent)', delay: 0   },
-    { text: `> Connecting to api.github.com...`,            color: '#c9d1d9',       delay: 400 },
-    { text: `> Verifying token...`,                         color: '#c9d1d9',       delay: 900 },
-    { text: `> Checking repository access...`,              color: '#c9d1d9',       delay: 1400 },
-  ];
+  const match = (await sha256(pin)) === localStorage.getItem('admin_pin_hash');
 
-  for (const line of lines) {
-    await sleep(line.delay === 0 ? 0 : line.delay - (lines[lines.indexOf(line) - 1]?.delay ?? 0));
-    await typeLine(out, line.text, line.color);
-  }
-
-  // wait for API
-  try {
-    const res = await apiCall;
-    if (!res.ok) throw new Error('Invalid token or no repo access.');
-
-    await sleep(300);
-    await typeLine(out, `✓ Token valid`,              'var(--accent)');
+  if (match) {
+    await typeLine(out, '✓ PIN accepted',     'var(--accent)');
     await sleep(200);
-    await typeLine(out, `✓ Repository access confirmed`, 'var(--accent)');
-    await sleep(200);
-    await typeLine(out, `✓ Welcome, Karthik`,         'var(--accent)');
-    await sleep(700);
-
-    localStorage.setItem('gh_token', token);
+    await typeLine(out, '✓ Welcome, Karthik', 'var(--accent)');
+    await sleep(650);
+    sessionStorage.setItem('admin_auth', '1');
     hideOverlay();
-    showToast('Authenticated ✓', 'success');
-
-  } catch (e) {
-    await sleep(300);
-    await typeLine(out, `✗ ${e.message}`, 'var(--danger)');
-    await sleep(1200);
-    // go back to form
+    showToast('Welcome back ✓', 'success');
+  } else {
+    await typeLine(out, '✗ Incorrect PIN — access denied', 'var(--danger)');
+    await sleep(1400);
     document.getElementById('auth-terminal').style.display = 'none';
-    document.getElementById('auth-form').style.display     = 'block';
-    showErr(err, e.message);
+    document.getElementById('login-screen').style.display  = 'block';
+    document.getElementById('pin-input').value = '';
+    showErr(err, 'Incorrect PIN. Try again.');
   }
+}
+
+/* ── Change PIN ──────────────────────────────────── */
+function openChangePin() {
+  document.getElementById('change-pin-modal').style.display = 'flex';
+  document.getElementById('current-pin').focus();
+}
+
+function closeChangePin() {
+  document.getElementById('change-pin-modal').style.display = 'none';
+  ['current-pin', 'new-pin', 'confirm-new-pin'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('pin-change-error').style.display = 'none';
+}
+
+async function changePinSubmit() {
+  const current = document.getElementById('current-pin').value;
+  const newPin  = document.getElementById('new-pin').value;
+  const confirm = document.getElementById('confirm-new-pin').value;
+  const err     = document.getElementById('pin-change-error');
+  err.style.display = 'none';
+
+  if (!current || !newPin || !confirm) { showErr(err, 'All fields are required.'); return; }
+  if (newPin !== confirm)              { showErr(err, 'New PINs do not match.'); return; }
+  if ((await sha256(current)) !== localStorage.getItem('admin_pin_hash')) {
+    showErr(err, 'Current PIN is incorrect.'); return;
+  }
+
+  localStorage.setItem('admin_pin_hash', await sha256(newPin));
+  closeChangePin();
+  showToast('PIN updated ✓', 'success');
+}
+
+/* ── Logout ──────────────────────────────────────── */
+function logout() {
+  sessionStorage.removeItem('admin_auth');
+  location.reload();
+}
+
+/* ── SHA-256 via Web Crypto ──────────────────────── */
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 /* ── Terminal helpers ────────────────────────────── */
-function sleep(ms) {
-  return new Promise(r => setTimeout(r, ms));
-}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 async function typeLine(container, text, color = '#c9d1d9', speed = 18) {
-  const span = document.createElement('div');
-  span.style.color = color;
-  container.appendChild(span);
-
-  for (const ch of text) {
-    span.textContent += ch;
-    await sleep(speed);
-  }
+  const div = document.createElement('div');
+  div.style.color = color;
+  container.appendChild(div);
+  for (const ch of text) { div.textContent += ch; await sleep(speed); }
   await sleep(60);
 }
 
 function hideOverlay() {
-  const overlay = document.getElementById('auth-overlay');
-  if (overlay) overlay.style.display = 'none';
+  const el = document.getElementById('auth-overlay');
+  if (el) el.style.display = 'none';
 }
 
-function logout() {
-  localStorage.removeItem('gh_token');
-  location.reload();
-}
-
-/* ── Slug / Preview ─────────────────────────────────── */
+/* ── Slug / Preview ──────────────────────────────── */
 function updateSlug() {
-  const title = document.getElementById('post-title').value;
-  document.getElementById('post-slug').value = slugify(title);
+  document.getElementById('post-slug').value = slugify(
+    document.getElementById('post-title').value
+  );
 }
 
 function togglePreview() {
-  const panel   = document.getElementById('preview-panel');
-  const content = document.getElementById('post-content').value;
-  const btn     = document.getElementById('preview-btn');
-
+  const panel = document.getElementById('preview-panel');
+  const btn   = document.getElementById('preview-btn');
   if (panel.classList.contains('visible')) {
     panel.classList.remove('visible');
-    btn.textContent = '👁 Preview';
+    btn.innerHTML = `<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg> Preview`;
   } else {
     marked.setOptions({ breaks: true, gfm: true });
-    document.getElementById('preview-content').innerHTML = marked.parse(content || '');
+    document.getElementById('preview-content').innerHTML =
+      marked.parse(document.getElementById('post-content').value || '');
     panel.classList.add('visible');
     panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     btn.textContent = '✕ Close preview';
   }
 }
 
-/* ── Publish ─────────────────────────────────────────── */
+/* ── Publish ─────────────────────────────────────── */
 async function publishPost() {
-  const token   = localStorage.getItem('gh_token');
-  if (!token) { location.reload(); return; }
+  const token = localStorage.getItem('gh_token');
+  if (!token) {
+    showToast('GitHub token not set. Add it in Settings.', 'error');
+    return;
+  }
 
   const title   = document.getElementById('post-title').value.trim();
   const slug    = document.getElementById('post-slug').value.trim();
@@ -134,16 +176,14 @@ async function publishPost() {
   const tagsRaw = document.getElementById('post-tags').value;
   const content = document.getElementById('post-content').value.trim();
 
-  // Validate
-  if (!title) { showToast('Title is required.', 'error'); return; }
-  if (!slug)  { showToast('Slug is required.', 'error'); return; }
-  if (!date)  { showToast('Date is required.', 'error'); return; }
+  if (!title)   { showToast('Title is required.', 'error'); return; }
+  if (!slug)    { showToast('Slug is required.', 'error'); return; }
+  if (!date)    { showToast('Date is required.', 'error'); return; }
   if (!content) { showToast('Content is required.', 'error'); return; }
 
-  const tags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
-  const excerpt = makeExcerpt(content);
+  const tags     = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
+  const excerpt  = makeExcerpt(content);
   const readTime = estimateReadTime(content);
-
   const postData = { slug, title, date, tags, excerpt, readTime, content };
 
   const btn = document.getElementById('publish-btn');
@@ -151,24 +191,14 @@ async function publishPost() {
   btn.textContent = 'Publishing...';
 
   try {
-    // 1 — Create posts/slug.json
-    await githubPut(
-      `html/posts/${slug}.json`,
-      JSON.stringify(postData, null, 2),
-      `add post: ${title}`
-    );
+    await githubPut(`html/posts/${slug}.json`, JSON.stringify(postData, null, 2), `add post: ${title}`);
 
-    // 2 — Update posts.json (prepend new post to list)
     const existing = await githubGetJson('html/posts.json');
-    const updatedPosts = [
+    const updated  = [
       { slug, title, date, tags, excerpt, readTime },
       ...(existing.posts || []).filter(p => p.slug !== slug)
     ];
-    await githubPut(
-      'html/posts.json',
-      JSON.stringify({ posts: updatedPosts }, null, 2),
-      `update posts index: ${title}`
-    );
+    await githubPut('html/posts.json', JSON.stringify({ posts: updated }, null, 2), `update index: ${title}`);
 
     showToast('Published! Deploying in ~60s ✓', 'success');
     setTimeout(() => {
@@ -183,32 +213,19 @@ async function publishPost() {
   }
 }
 
-/* ── GitHub API helpers ─────────────────────────────── */
+/* ── GitHub API helpers ──────────────────────────── */
 async function githubPut(path, content, message) {
   const token = localStorage.getItem('gh_token');
   const sha   = await githubFileSha(path);
-
-  const body = {
-    message,
-    content: b64encode(content),
-    branch: BRANCH
-  };
+  const body  = { message, content: b64encode(content), branch: BRANCH };
   if (sha) body.sha = sha;
 
   const res = await fetch(`${API}/repos/${REPO}/contents/${path}`, {
     method: 'PUT',
-    headers: {
-      Authorization: `token ${token}`,
-      Accept: 'application/vnd.github.v3+json',
-      'Content-Type': 'application/json'
-    },
+    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
-
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || `GitHub API error (${res.status})`);
-  }
+  if (!res.ok) { const e = await res.json(); throw new Error(e.message || `GitHub API ${res.status}`); }
   return res.json();
 }
 
@@ -218,8 +235,7 @@ async function githubFileSha(path) {
     headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
   });
   if (res.status === 404) return null;
-  const data = await res.json();
-  return data.sha || null;
+  return (await res.json()).sha || null;
 }
 
 async function githubGetJson(path) {
@@ -232,35 +248,22 @@ async function githubGetJson(path) {
   return JSON.parse(atob(data.content.replace(/\n/g, '')));
 }
 
-/* ── Utilities ───────────────────────────────────────── */
+/* ── Utilities ───────────────────────────────────── */
 function slugify(str) {
-  return str.toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '');
+  return str.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
 }
 
 function makeExcerpt(content, len = 160) {
-  const stripped = content
-    .replace(/```[\s\S]*?```/g, '')
-    .replace(/`[^`]+`/g, '')
-    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
-    .replace(/\[[^\]]*\]\([^)]*\)/g, '')
-    .replace(/[#*_>~\-]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-  return stripped.length > len ? stripped.slice(0, len).trimEnd() + '...' : stripped;
+  return content
+    .replace(/```[\s\S]*?```/g, '').replace(/`[^`]+`/g, '')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\[[^\]]*\]\([^)]*\)/g, '')
+    .replace(/[#*_>~\-]/g, '').replace(/\s+/g, ' ').trim()
+    .slice(0, len).trimEnd() + (content.length > len ? '...' : '');
 }
 
-function b64encode(str) {
-  return btoa(unescape(encodeURIComponent(str)));
-}
+function b64encode(str) { return btoa(unescape(encodeURIComponent(str))); }
 
-function showErr(el, msg) {
-  el.textContent = msg;
-  el.style.display = 'block';
-}
+function showErr(el, msg) { el.textContent = msg; el.style.display = 'block'; }
 
 function showToast(msg, type = 'success') {
   const t = document.getElementById('toast');

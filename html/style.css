@@ -10,11 +10,11 @@
   --text:         #e6edf3;
   --text-2:       #c9d1d9;
   --muted:        #8b949e;
-  --accent:       #3fb950;
-  --accent-hover: #56d364;
-  --accent-dim:   #1a4329;
-  --tag-bg:       #1f2d1f;
-  --tag-text:     #7ee787;
+  --accent:       #00d4ff;
+  --accent-hover: #33ddff;
+  --accent-dim:   #002233;
+  --tag-bg:       #001e2e;
+  --tag-text:     #7dd3fc;
   --danger:       #f85149;
   --sidebar-w:    260px;
 }
@@ -67,7 +67,7 @@ a:hover { text-decoration: underline; }
   letter-spacing: 0.1em;
   color: var(--muted);
   padding: 0 0.5rem;
-  margin-bottom: -0.75rem;
+  margin-bottom: 0.25rem;
   display: block;
 }
 
