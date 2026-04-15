@@ -48,7 +48,7 @@
   <div>
     <span class="sidebar-section-label" style="display:block;margin-bottom:0.75rem;"><span style="color:var(--accent)">Contact</span></span>
     <div class="sidebar-contacts">
-      <a href="mailto:karthik@munagalakarthik.com">
+      <a href="#" id="sidebar-email">
         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
         </svg>
@@ -118,11 +118,78 @@
   <div class="sb-item" style="margin-left:auto">logs.munagalakarthik.com</div>
 </div>
 
+<!-- ── Email Toast (exact domain implementation) ── -->
+<div id="email-toast" style="display:none" aria-live="polite" role="status">
+  <div class="t-scan"></div>
+  <div class="t-header">
+    <span class="t-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect width="20" height="16" x="2" y="4" rx="2" />
+        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+      </svg></span>
+    <span class="t-label">copied</span>
+    <button class="t-close" id="email-toast-close" aria-label="Close">&times;</button>
+  </div>
+  <div class="t-title">Email Copied!</div>
+  <div class="t-msg">
+    <span>karthik@munagalakarthik.com</span> is in your clipboard.<br>
+    Paste it into any email app to get in touch.
+  </div>
+  <div class="t-bar">
+    <div class="t-bar-fill" id="email-toast-bar"></div>
+  </div>
+</div>
+
 <script src="script.js"></script>
 <script>
   startClock();
   loadPosts();
   trackAndShowVisitors();
+
+  // ── Email copy-to-clipboard (exact domain implementation)
+  const emailBtn        = document.getElementById('sidebar-email');
+  const emailToast      = document.getElementById('email-toast');
+  const emailToastClose = document.getElementById('email-toast-close');
+  const EMAIL_ADDR      = 'karthik@munagalakarthik.com';
+  const EMAIL_DUR       = 3000;
+  let emailTimer        = null;
+
+  function showEmailToast() {
+    clearTimeout(emailTimer);
+    const bar = document.getElementById('email-toast-bar');
+    bar.style.animation = 'none';
+    void bar.offsetWidth;
+    bar.style.setProperty('--toast-dur', EMAIL_DUR + 'ms');
+    bar.style.animation = '';
+    emailToast.classList.remove('hide');
+    emailToast.style.display = 'block';
+    void emailToast.offsetWidth;
+    emailTimer = setTimeout(hideEmailToast, EMAIL_DUR);
+  }
+
+  function hideEmailToast() {
+    emailToast.classList.add('hide');
+    setTimeout(() => {
+      emailToast.style.display = 'none';
+      emailToast.classList.remove('hide');
+    }, 380);
+  }
+
+  emailBtn.addEventListener('click', e => {
+    e.preventDefault();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(EMAIL_ADDR).then(showEmailToast).catch(() => {
+        window.location.href = 'mailto:' + EMAIL_ADDR;
+      });
+    } else {
+      window.location.href = 'mailto:' + EMAIL_ADDR;
+    }
+  });
+
+  emailToastClose.addEventListener('click', () => {
+    clearTimeout(emailTimer);
+    hideEmailToast();
+  });
 </script>
 </body>
 </html>
