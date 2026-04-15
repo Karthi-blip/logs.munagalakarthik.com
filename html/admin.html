@@ -123,6 +123,12 @@
   </div>
 
   <div class="sidebar-footer" style="display:flex;flex-direction:column;gap:0.5rem;">
+    <button class="btn btn-secondary" onclick="openTokenModal()" style="width:100%;justify-content:center;font-size:0.8rem;">
+      <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+      </svg>
+      GitHub Token
+    </button>
     <button class="btn btn-secondary" onclick="openChangePin()" style="width:100%;justify-content:center;font-size:0.8rem;">
       <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
@@ -221,6 +227,33 @@
     </div>
     <div id="pin-change-error" style="color:var(--danger);font-size:0.82rem;margin-bottom:0.75rem;display:none;"></div>
     <button class="btn btn-primary" onclick="changePinSubmit()" style="width:100%">Update PIN</button>
+  </div>
+</div>
+
+<!-- ── GitHub Token Modal ───────────────────────────── -->
+<div class="auth-overlay" id="token-modal" style="display:none;">
+  <div class="auth-card" style="position:relative;">
+    <button onclick="closeTokenModal()" style="
+      position:absolute;top:1rem;right:1rem;
+      background:none;border:none;cursor:pointer;
+      color:var(--muted);padding:4px;border-radius:4px;
+      line-height:1;transition:color 0.15s;
+    " onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+    <h2>GitHub Token</h2>
+    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1rem;">
+      Needed to auto-publish posts. Create a token at<br>
+      <strong>GitHub → Settings → Developer settings → Fine-grained tokens</strong><br>
+      with <strong>Contents: Read & write</strong> on this repo.
+    </p>
+    <div class="form-group">
+      <label>Personal Access Token</label>
+      <input type="password" id="token-input" placeholder="github_pat_..." autocomplete="off">
+    </div>
+    <button class="btn btn-primary" onclick="saveToken()" style="width:100%">Save Token</button>
   </div>
 </div>
 

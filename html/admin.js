@@ -178,7 +178,60 @@ function togglePreview() {
   }
 }
 
-/* ── Publish (no GitHub PAT required) ───────────── */
+/* ── GitHub config ───────────────────────────────── */
+const GH_REPO   = 'Karthi-blip/logs.munagalakarthik.com';
+const GH_BRANCH = 'main';
+
+function getToken() { return localStorage.getItem('github_pat') || ''; }
+
+function openTokenModal() {
+  document.getElementById('token-modal').style.display = 'flex';
+  document.getElementById('token-input').value = getToken();
+  document.getElementById('token-input').focus();
+}
+
+function closeTokenModal() {
+  document.getElementById('token-modal').style.display = 'none';
+}
+
+function saveToken() {
+  const val = document.getElementById('token-input').value.trim();
+  if (!val) { showToast('Token cannot be empty.', 'error'); return; }
+  localStorage.setItem('github_pat', val);
+  closeTokenModal();
+  showToast('GitHub token saved ✓', 'success');
+}
+
+/* ── GitHub API helpers ──────────────────────────── */
+async function ghGet(path) {
+  const r = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${path}`, {
+    headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' }
+  });
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error(`GitHub GET failed: ${r.status}`);
+  return r.json();
+}
+
+async function ghPut(path, content, message, sha) {
+  const body = { message, content: btoa(String.fromCharCode(...new TextEncoder().encode(content))), branch: GH_BRANCH };
+  if (sha) body.sha = sha;
+  const r = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${path}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `token ${getToken()}`,
+      Accept: 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({}));
+    throw new Error(err.message || `GitHub PUT failed: ${r.status}`);
+  }
+  return r.json();
+}
+
+/* ── Publish via GitHub API ──────────────────────── */
 async function publishPost() {
   const title   = document.getElementById('post-title').value.trim();
   const slug    = document.getElementById('post-slug').value.trim();
@@ -191,6 +244,12 @@ async function publishPost() {
   if (!date)    { showToast('Date is required.', 'error'); return; }
   if (!content) { showToast('Content is required.', 'error'); return; }
 
+  if (!getToken()) {
+    showToast('Set your GitHub token first.', 'error');
+    openTokenModal();
+    return;
+  }
+
   const tags     = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
   const excerpt  = makeExcerpt(content);
   const readTime = estimateReadTime(content);
@@ -201,51 +260,33 @@ async function publishPost() {
   btn.innerHTML = `<span style="opacity:0.7">Publishing...</span>`;
 
   try {
-    // ── 1. Save individual post file ──────────────────
-    saveFile(`posts/${slug}.json`, JSON.stringify(postData, null, 2));
-    await sleep(300);
+    // ── 1. Commit post file ───────────────────────────
+    const postPath    = `html/posts/${slug}.json`;
+    const existingPost = await ghGet(postPath);
+    await ghPut(postPath, JSON.stringify(postData, null, 2), `post: ${title}`, existingPost?.sha);
 
-    // ── 2. Read existing posts index from localStorage ─
-    let existingPosts = [];
-    try {
-      const stored = localStorage.getItem('posts_index');
-      existingPosts = stored ? JSON.parse(stored) : [];
-    } catch (_) { existingPosts = []; }
-
-    const updated = [
+    // ── 2. Update posts.json index ────────────────────
+    const indexPath    = 'html/posts.json';
+    const existingIndex = await ghGet(indexPath);
+    let existingPosts   = [];
+    if (existingIndex) {
+      try { existingPosts = JSON.parse(atob(existingIndex.content.replace(/\n/g, ''))).posts || []; }
+      catch (_) {}
+    }
+    const updatedPosts = [
       { slug, title, date, tags, excerpt, readTime },
       ...existingPosts.filter(p => p.slug !== slug)
     ];
-    localStorage.setItem('posts_index', JSON.stringify(updated));
+    await ghPut(indexPath, JSON.stringify({ posts: updatedPosts }, null, 2), `post: ${title}`, existingIndex?.sha);
 
-    // ── 3. Download updated posts.json for deployment ──
-    await sleep(200);
-    saveFile('posts.json', JSON.stringify({ posts: updated }, null, 2));
-
-    showToast('Published ✓ — replace posts.json on server', 'success');
-    setTimeout(() => {
-      if (confirm('Post files downloaded. Go to homepage?')) location.href = 'index.html';
-    }, 1200);
+    showToast('Published ✓ — deploying (~1 min)', 'success');
+    setTimeout(() => { location.href = 'index.html'; }, 1500);
 
   } catch (e) {
     showToast('Error: ' + e.message, 'error');
-  } finally {
     btn.disabled = false;
     btn.innerHTML = `<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg> Publish`;
   }
-}
-
-/* ── File download helper ────────────────────────── */
-function saveFile(filename, content) {
-  const blob = new Blob([content], { type: 'application/json' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href = url;
-  a.download = filename.split('/').pop();
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
 }
 
 
@@ -262,7 +303,7 @@ function makeExcerpt(content, len = 160) {
     .slice(0, len).trimEnd() + (content.length > len ? '...' : '');
 }
 
-function b64encode(str) { return btoa(unescape(encodeURIComponent(str))); }
+function b64encode(str) { return btoa(String.fromCharCode(...new TextEncoder().encode(str))); }
 
 function showErr(el, msg) { el.textContent = msg; el.style.display = 'block'; }
 
