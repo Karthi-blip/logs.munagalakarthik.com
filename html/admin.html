@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>~/logs · admin</title>
   <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
@@ -20,13 +21,7 @@
 (function() {
   const ts = localStorage.getItem('admin_auth_ts');
   const valid = ts && (Date.now() - parseInt(ts, 10)) < (24 * 60 * 60 * 1000);
-  const hasPin = !!localStorage.getItem('admin_pin_hash');
-  // If they have no PIN set at all — first-time setup, allow through
-  // If they have PIN but session expired — show the auth overlay (handled by initAdmin)
-  // We do NOT hard-redirect here so the overlay shows normally
-  // But we DO block direct access when PIN exists and session is invalid by hiding main content
-  if (hasPin && !valid) {
-    // The overlay will cover everything; just ensure main stays hidden until auth
+  if (!valid) {
     document.addEventListener('DOMContentLoaded', function() {
       const main = document.querySelector('main');
       if (main) main.style.visibility = 'hidden';
@@ -51,21 +46,6 @@
       </svg>
     </button>
 
-    <!-- First-time setup -->
-    <div id="setup-screen" style="display:none;">
-      <h2>Set up PIN</h2>
-      <p>Create a PIN to protect your admin panel.</p>
-      <div class="form-group">
-        <label>New PIN</label>
-        <input type="password" id="setup-pin" inputmode="numeric" placeholder="Enter PIN" autocomplete="new-password">
-      </div>
-      <div class="form-group">
-        <label>Confirm PIN</label>
-        <input type="password" id="setup-pin-confirm" inputmode="numeric" placeholder="Confirm PIN" autocomplete="new-password">
-      </div>
-      <div id="setup-error" style="color:var(--danger);font-size:0.82rem;margin-bottom:0.75rem;display:none;"></div>
-      <button class="btn btn-primary" onclick="setupPin()" style="width:100%">Set PIN</button>
-    </div>
 
     <!-- Login -->
     <div id="login-screen" style="display:none;">

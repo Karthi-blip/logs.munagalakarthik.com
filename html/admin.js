@@ -1,3 +1,14 @@
+/* ── PIN hash (SHA-256 of the admin PIN) ────────── */
+// This is the source-of-truth hash. Change PIN stores an override in
+// localStorage; that override takes priority so you can update without
+// editing this file. In incognito / any browser with no localStorage,
+// this hardcoded hash is used — the setup screen is never shown.
+const HARDCODED_PIN_HASH = '21f261270b80b9143303dd301b1cc4ac0a7dcd62cf3bf0288e5e0e4f0c0940f6';
+
+function getPinHash() {
+  return localStorage.getItem('admin_pin_hash') || HARDCODED_PIN_HASH;
+}
+
 /* ── Session helpers (24-hour expiry) ───────────── */
 const SESSION_KEY    = 'admin_auth_ts';
 const SESSION_HOURS  = 24;
@@ -23,37 +34,15 @@ function initAdmin() {
     hideOverlay();
     return;
   }
-  // expired or no session — force auth
-  const hash = localStorage.getItem('admin_pin_hash');
-  if (hash) {
-    // returning user — show login
-    document.getElementById('login-screen').style.display = 'block';
-    const input = document.getElementById('pin-input');
-    if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter') verifyPin(); });
-  } else {
-    // first time — show setup
-    document.getElementById('setup-screen').style.display = 'block';
-    const c = document.getElementById('setup-pin-confirm');
-    if (c) c.addEventListener('keydown', e => { if (e.key === 'Enter') setupPin(); });
-  }
-}
-
-/* ── First-time PIN setup ────────────────────────── */
-async function setupPin() {
-  const pin    = document.getElementById('setup-pin').value;
-  const confirm = document.getElementById('setup-pin-confirm').value;
-  const err    = document.getElementById('setup-error');
-  err.style.display = 'none';
-  if (!pin)            { showErr(err, 'Please enter a PIN.'); return; }
-  if (pin !== confirm) { showErr(err, 'PINs do not match.'); return; }
-  localStorage.setItem('admin_pin_hash', await sha256(pin));
-  document.getElementById('setup-screen').style.display = 'none';
+  // always show login — setup screen is gone
   document.getElementById('login-screen').style.display = 'block';
-  showToast('PIN set. Please log in.', 'success');
-  document.getElementById('pin-input').focus();
+  const input = document.getElementById('pin-input');
+  if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter') verifyPin(); });
 }
 
 /* ── PIN login ───────────────────────────────────── */
+
+
 async function verifyPin() {
   const pin = document.getElementById('pin-input').value;
   const err = document.getElementById('auth-error');
@@ -72,7 +61,7 @@ async function verifyPin() {
   await typeLine(out, '> Verifying PIN...',  '#c9d1d9', 12);
   await sleep(250);
 
-  const match = (await sha256(pin)) === localStorage.getItem('admin_pin_hash');
+  const match = (await sha256(pin)) === getPinHash();
 
   if (match) {
     await typeLine(out, '✓ Access granted', 'var(--accent)', 12);
@@ -115,7 +104,7 @@ async function changePinSubmit() {
 
   if (!current || !newPin || !confirm) { showErr(err, 'All fields are required.'); return; }
   if (newPin !== confirm)              { showErr(err, 'New PINs do not match.'); return; }
-  if ((await sha256(current)) !== localStorage.getItem('admin_pin_hash')) {
+  if ((await sha256(current)) !== getPinHash()) {
     showErr(err, 'Current PIN is incorrect.'); return;
   }
 
