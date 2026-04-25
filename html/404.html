@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 // Not Found — logs</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060a0f;--cyan:#00d4ff;--cyan2:#0099cc;
+  --green:#00ff88;--red:#ff3355;--muted:#4a6080;
+  --text:#c8d8e8;--border:#1a2a3a;--purple:#aa66ff;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Syne',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:var(--mono);font-size:14px;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;min-height:100vh;overflow-y:auto;
+}
+
+/* Scanlines */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,212,255,0.012) 2px,rgba(0,212,255,0.012) 4px);
+  pointer-events:none;z-index:0;
+}
+
+/* Grid */
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.02) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,212,255,0.02) 1px,transparent 1px);
+  background-size:60px 60px;pointer-events:none;z-index:0;
+}
+
+.scan{
+  position:fixed;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  animation:scanDown 6s linear infinite;opacity:0.25;pointer-events:none;z-index:1;
+}
+@keyframes scanDown{from{top:0}to{top:100vh}}
+
+.container{
+  position:relative;z-index:2;
+  max-width:680px;width:calc(100% - 48px);
+  padding:20px;text-align:left;
+}
+
+/* Big 404 number */
+.err-num{
+  font-family:var(--sans);
+  font-size:clamp(100px,22vw,172px);
+  font-weight:800;line-height:0.82;
+  color:transparent;
+  -webkit-text-stroke:2px var(--cyan);
+  letter-spacing:-4px;
+  animation:glitch 7s infinite 2s;
+  margin-bottom:4px;
+}
+@keyframes glitch{
+  0%,88%,100%{clip-path:none;transform:none}
+  90%{clip-path:polygon(0 20%,100% 20%,100% 28%,0 28%);transform:translateX(-6px)}
+  91%{clip-path:none;transform:none}
+  94%{clip-path:polygon(0 60%,100% 60%,100% 68%,0 68%);transform:translateX(5px)}
+  95%{clip-path:none}
+}
+
+.err-tag{
+  font-size:10px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--red);margin-bottom:36px;display:flex;align-items:center;gap:10px;
+}
+.err-tag::before{content:'';display:block;width:32px;height:1px;background:var(--red)}
+
+/* Terminal card */
+.term{
+  background:rgba(10,16,24,0.92);
+  border:1px solid var(--border);
+  border-top:2px solid var(--red);
+  padding:26px 30px;
+  margin-bottom:30px;
+  backdrop-filter:blur(10px);
+}
+.tline{font-size:12px;margin-bottom:8px;line-height:1.8}
+.prompt{color:var(--cyan)}
+.err{color:var(--red)}
+.hint{color:var(--muted)}
+.path{color:var(--green)}
+.blink{display:inline-block;animation:blink 1s infinite;color:var(--cyan)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* Buttons */
+.actions{display:flex;gap:14px;flex-wrap:wrap}
+.btn-home{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--cyan);color:var(--bg);
+  padding:13px 30px;font-family:var(--mono);font-size:11px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;text-decoration:none;
+  clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+  transition:box-shadow 0.3s,transform 0.3s;
+}
+.btn-home:hover{box-shadow:0 0 40px rgba(0,212,255,0.45);transform:translateY(-3px)}
+
+/* Terminal input */
+.term-body{
+  max-height:220px;overflow-y:auto;scrollbar-width:thin;
+  scrollbar-color:var(--muted) transparent;
+}
+.term-body::-webkit-scrollbar{width:4px}
+.term-body::-webkit-scrollbar-thumb{background:var(--muted);border-radius:2px}
+.input-row{
+  display:flex;align-items:center;gap:0;margin-top:8px;
+}
+.input-row .prompt{white-space:nowrap;font-size:12px}
+#term-input{
+  background:transparent;border:none;outline:none;
+  color:var(--cyan);font-family:var(--mono);font-size:12px;
+  caret-color:var(--cyan);flex:1;padding:0 0 0 6px;
+  width:100%;
+}
+.out-line{font-size:12px;line-height:1.8;white-space:pre-wrap;word-break:break-all}
+.out-cmd{color:var(--text)}
+.out-err{color:var(--red)}
+.out-ok{color:var(--green)}
+.out-hint{color:var(--muted)}
+.out-info{color:var(--cyan)}
+
+/* Branding */
+.brand{
+  position:fixed;top:0;left:0;right:0;
+  padding:18px 40px;
+  font-size:13px;color:var(--cyan);letter-spacing:2px;
+  display:flex;justify-content:space-between;align-items:center;
+  background:rgba(6,10,15,0.75);backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(26,42,58,0.5);z-index:10;
+}
+.brand span{color:var(--muted)}
+
+@media(max-width:600px){
+  .err-num{font-size:clamp(80px,28vw,120px)}
+  .brand{padding:14px 20px;font-size:11px}
+  .actions{flex-direction:column}
+  .btn-home{justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<div class="scan"></div>
+
+<div class="brand">
+  <span><span>~/</span>logs</span>
+  <span style="font-size:11px;letter-spacing:1px;">ERROR_404</span>
+</div>
+
+<div class="container">
+  <div class="err-num">404</div>
+  <div class="err-tag">POST OR PAGE NOT FOUND</div>
+
+  <div class="term" id="term-card" style="cursor:text;">
+    <div class="term-body" id="term-body">
+      <div class="tline">
+        <span class="prompt">karthik@logs:~$</span>
+        <span> locate </span><span class="path" id="req-path">/unknown</span>
+      </div>
+      <div class="tline"><span class="err">✗ ERROR: No such file or directory</span></div>
+      <div class="tline"><span class="hint"># The requested resource could not be found.</span></div>
+      <div class="tline" style="margin-top:4px"><span class="hint"># Type <span style="color:var(--cyan)">help</span> to see available commands.</span></div>
+    </div>
+    <div class="input-row" style="margin-top:10px">
+      <span class="prompt">karthik@logs:~$</span>
+      <input id="term-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="">
+    </div>
+  </div>
+
+  <div class="actions">
+    <a href="index.html" class="btn-home">← Return to Logs</a>
+  </div>
+</div>
+
+<script>
+  // Show the attempted path
+  const el = document.getElementById('req-path');
+  if (el) el.textContent = window.location.pathname || '/unknown';
+
+  // ── Interactive Terminal ──────────────────────────────────────────────
+  const body   = document.getElementById('term-body');
+  const input  = document.getElementById('term-input');
+  const card   = document.getElementById('term-card');
+  const history = [];
+  let histIdx = -1;
+
+  const COMMANDS = {
+    help: () => [
+      {t:'ok',  v:'Available commands:'},
+      {t:'info',v:'  help          — show this list'},
+      {t:'info',v:'  ls            — list files'},
+      {t:'info',v:'  cd <dir>      — navigate'},
+      {t:'info',v:'  whoami        — identify current user'},
+      {t:'info',v:'  uname         — system info'},
+      {t:'info',v:'  clear         — clear terminal'},
+      {t:'info',v:'  home          — return to index'},
+    ],
+    ls: () => [
+      {t:'ok', v:'drwxr-xr-x  posts'},
+      {t:'ok', v:'-rw-r--r--  index.html'},
+      {t:'ok', v:'-rw-r--r--  admin.html'},
+      {t:'ok', v:'-rw-r--r--  post.html'},
+    ],
+    whoami: () => [{t:'ok', v:'reader — guest access'}],
+    uname:  () => [{t:'ok', v:'Logs OS v1.0 — Kernel: BlogSec'}],
+    home:   () => { window.location.href = 'index.html'; return [{t:'ok', v:'Redirecting to index...'}]; },
+    clear:  () => '__clear__',
+  };
+
+  function print(lines) {
+    lines.forEach(({t, v}) => {
+      const d = document.createElement('div');
+      d.className = `out-line out-${t}`;
+      d.textContent = v;
+      body.appendChild(d);
+    });
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function printCmd(cmd) {
+    const d = document.createElement('div');
+    d.className = 'out-line';
+    d.innerHTML = `<span class="prompt">karthik@logs:~$</span> <span class="out-cmd">${cmd}</span>`;
+    body.appendChild(d);
+  }
+
+  function run(raw) {
+    const trimmed = raw.trim();
+    if (!trimmed) return;
+    history.unshift(trimmed);
+    histIdx = -1;
+    printCmd(trimmed);
+
+    const [cmd, ...args] = trimmed.toLowerCase().split(/\s+/);
+
+    if (cmd === 'cd') {
+      const target = (args[0] || '').replace(/^#/, '').toLowerCase();
+      if (target === 'admin' || target === 'admin.html') {
+        print([{t:'ok', v:`Navigating to admin...`}]);
+        setTimeout(() => window.location.href = 'admin.html', 500);
+      } else if (target === 'posts' || target === '..') {
+        print([{t:'ok', v:`Navigating to index...`}]);
+        setTimeout(() => window.location.href = 'index.html', 500);
+      } else {
+        print([{t:'err', v:`✗ cd: ${target || '<dir>'}: No such file or directory`}]);
+      }
+      return;
+    }
+
+    if (COMMANDS[cmd]) {
+      const result = COMMANDS[cmd](args);
+      if (result === '__clear__') { body.innerHTML = ''; return; }
+      print(result);
+    } else {
+      print([
+        {t:'err',  v:`✗ command not found: ${trimmed}`},
+        {t:'hint', v:'  Type help for available commands'},
+      ]);
+    }
+  }
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const val = input.value;
+      input.value = '';
+      run(val);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (histIdx < history.length - 1) { histIdx++; input.value = history[histIdx]; }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (histIdx > 0) { histIdx--; input.value = history[histIdx]; }
+      else { histIdx = -1; input.value = ''; }
+    }
+  });
+
+  card.addEventListener('click', () => input.focus());
+  input.focus();
+</script>
+</body>
+</html>

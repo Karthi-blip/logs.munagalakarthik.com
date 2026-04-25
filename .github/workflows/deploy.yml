@@ -34,9 +34,25 @@ jobs:
           echo "S3_BUCKET_NAME=$(echo $SECRET | jq -r '.S3_BUCKET_NAME')" >> $GITHUB_ENV
           echo "CLOUDFRONT_DISTRIBUTION_ID=$(echo $SECRET | jq -r '.CLOUDFRONT_DISTRIBUTION_ID')" >> $GITHUB_ENV
 
-      - name: Deploy all files to S3
+      - name: Deploy static assets to S3
         run: |
           aws s3 sync html/ s3://${{ env.S3_BUCKET_NAME }}/ \
+            --exclude "*" \
+            --include "*.css" \
+            --include "*.js" \
+            --include "*.svg" \
+            --include "*.png" \
+            --include "*.jpg" \
+            --cache-control "max-age=31536000, public"
+
+      - name: Deploy dynamic files to S3
+        run: |
+          aws s3 sync html/ s3://${{ env.S3_BUCKET_NAME }}/ \
+            --exclude "*.css" \
+            --exclude "*.js" \
+            --exclude "*.svg" \
+            --exclude "*.png" \
+            --exclude "*.jpg" \
             --delete \
             --cache-control "no-cache, no-store, must-revalidate"
 

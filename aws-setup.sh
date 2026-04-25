@@ -20,28 +20,9 @@ aws s3api create-bucket \
   --bucket "$BUCKET" \
   --region "$REGION"
 
-aws s3api delete-public-access-block \
-  --bucket "$BUCKET"
-
-aws s3api put-bucket-policy \
+aws s3api put-public-access-block \
   --bucket "$BUCKET" \
-  --policy "{
-    \"Version\": \"2012-10-17\",
-    \"Statement\": [{
-      \"Sid\": \"PublicReadGetObject\",
-      \"Effect\": \"Allow\",
-      \"Principal\": \"*\",
-      \"Action\": \"s3:GetObject\",
-      \"Resource\": \"arn:aws:s3:::${BUCKET}/*\"
-    }]
-  }"
-
-aws s3api put-bucket-website \
-  --bucket "$BUCKET" \
-  --website-configuration '{
-    "IndexDocument": {"Suffix": "index.html"},
-    "ErrorDocument": {"Key": "404.html"}
-  }'
+  --public-access-block-configuration "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
 
 echo "✅ S3 bucket ready: $BUCKET"
 
@@ -127,7 +108,18 @@ echo "✅ Certificate issued: $CERT_ARN"
 
 echo ">>> Creating CloudFront distribution..."
 
-S3_ORIGIN="${BUCKET}.s3-website-${REGION}.amazonaws.com"
+OAC_ID=$(aws cloudfront create-origin-access-control \
+  --origin-access-control-config "{
+      \"Name\": \"OAC-${BUCKET}\",
+      \"Description\": \"OAC for ${BUCKET}\",
+      \"SigningProtocol\": \"sigv4\",
+      \"SigningBehavior\": \"always\",
+      \"OriginAccessControlOriginType\": \"s3\"
+  }" \
+  --query "OriginAccessControl.Id" \
+  --output text)
+
+S3_ORIGIN="${BUCKET}.s3.${REGION}.amazonaws.com"
 
 CF_DIST_ID=$(aws cloudfront create-distribution \
   --distribution-config "{
@@ -144,10 +136,9 @@ CF_DIST_ID=$(aws cloudfront create-distribution \
       \"Items\": [{
         \"Id\": \"S3-${BUCKET}\",
         \"DomainName\": \"${S3_ORIGIN}\",
-        \"CustomOriginConfig\": {
-          \"HTTPPort\": 80,
-          \"HTTPSPort\": 443,
-          \"OriginProtocolPolicy\": \"http-only\"
+        \"OriginAccessControlId\": \"${OAC_ID}\",
+        \"S3OriginConfig\": {
+          \"OriginAccessIdentity\": \"\"
         }
       }]
     },
@@ -165,7 +156,8 @@ CF_DIST_ID=$(aws cloudfront create-distribution \
       \"MinTTL\": 0,
       \"DefaultTTL\": 86400,
       \"MaxTTL\": 31536000,
-      \"Compress\": true
+      \"Compress\": true,
+      \"ResponseHeadersPolicyId\": \"67f7725c-6f97-4210-82d7-5512b31e9d03\"
     },
     \"CustomErrorResponses\": {
       \"Quantity\": 2,
@@ -203,6 +195,29 @@ CF_DOMAIN=$(aws cloudfront get-distribution \
   --output text)
 
 echo "CloudFront Domain: $CF_DOMAIN"
+
+echo ">>> Applying CloudFront OAC Bucket Policy..."
+ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+
+aws s3api put-bucket-policy \
+  --bucket "$BUCKET" \
+  --policy "{
+    \"Version\": \"2012-10-17\",
+    \"Statement\": [{
+      \"Sid\": \"AllowCloudFrontServicePrincipal\",
+      \"Effect\": \"Allow\",
+      \"Principal\": {
+        \"Service\": \"cloudfront.amazonaws.com\"
+      },
+      \"Action\": \"s3:GetObject\",
+      \"Resource\": \"arn:aws:s3:::${BUCKET}/*\",
+      \"Condition\": {
+        \"StringEquals\": {
+          \"AWS:SourceArn\": \"arn:aws:cloudfront::${ACCOUNT_ID}:distribution/${CF_DIST_ID}\"
+        }
+      }
+    }]
+  }"
 
 # ─────────────────────────────────────────────
 # STEP 5 — Route 53: logs → CloudFront

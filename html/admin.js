@@ -160,7 +160,7 @@ function togglePreview() {
   } else {
     marked.setOptions({ breaks: true, gfm: true });
     document.getElementById('preview-content').innerHTML =
-      marked.parse(document.getElementById('post-content').value || '');
+      DOMPurify.sanitize(marked.parse(document.getElementById('post-content').value || ''));
     panel.classList.add('visible');
     panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     btn.textContent = '✕ Close preview';
