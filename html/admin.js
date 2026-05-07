@@ -201,11 +201,9 @@ async function ghGet(path) {
   return r.json();
 }
 
-async function ghPut(path, content, message, sha) {
-  const body = { message, content: btoa(String.fromCharCode(...new TextEncoder().encode(content))), branch: GH_BRANCH };
-  if (sha) body.sha = sha;
-  const r = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${path}`, {
-    method: 'PUT',
+async function ghApi(path, method, body) {
+  const r = await fetch(`https://api.github.com/repos/${GH_REPO}/${path}`, {
+    method,
     headers: {
       Authorization: `token ${getToken()}`,
       Accept: 'application/vnd.github.v3+json',
@@ -215,12 +213,16 @@ async function ghPut(path, content, message, sha) {
   });
   if (!r.ok) {
     const err = await r.json().catch(() => ({}));
-    throw new Error(err.message || `GitHub PUT failed: ${r.status}`);
+    throw new Error(err.message || `GitHub ${method} failed: ${r.status}`);
   }
   return r.json();
 }
 
-/* ── Publish via GitHub API ──────────────────────── */
+function b64utf8(str) {
+  return btoa(String.fromCharCode(...new TextEncoder().encode(str)));
+}
+
+/* ── Publish via GitHub API (single atomic commit) ── */
 async function publishPost() {
   const title   = document.getElementById('post-title').value.trim();
   const slug    = document.getElementById('post-slug').value.trim();
@@ -249,15 +251,15 @@ async function publishPost() {
   btn.innerHTML = `<span style="opacity:0.7">Publishing...</span>`;
 
   try {
-    // ── 1. Commit post file ───────────────────────────
-    const postPath    = `html/posts/${slug}.json`;
-    const existingPost = await ghGet(postPath);
-    await ghPut(postPath, JSON.stringify(postData, null, 2), `post: ${title}`, existingPost?.sha);
+    // ── 1. Get current branch tip ─────────────────────
+    const ref = await ghApi(`git/refs/heads/${GH_BRANCH}`, 'GET');
+    const headSha = ref.object.sha;
+    const headCommit = await ghApi(`git/commits/${headSha}`, 'GET');
+    const baseTreeSha = headCommit.tree.sha;
 
-    // ── 2. Update posts.json index ────────────────────
-    const indexPath    = 'html/posts.json';
-    const existingIndex = await ghGet(indexPath);
-    let existingPosts   = [];
+    // ── 2. Read existing posts.json ───────────────────
+    const existingIndex = await ghGet('html/posts.json');
+    let existingPosts = [];
     if (existingIndex) {
       try { existingPosts = JSON.parse(atob(existingIndex.content.replace(/\n/g, ''))).posts || []; }
       catch (_) {}
@@ -266,7 +268,27 @@ async function publishPost() {
       { slug, title, date, tags, excerpt, readTime },
       ...existingPosts.filter(p => p.slug !== slug)
     ];
-    await ghPut(indexPath, JSON.stringify({ posts: updatedPosts }, null, 2), `post: ${title}`, existingIndex?.sha);
+
+    // ── 3. Create blobs for both files ────────────────
+    const postBlob  = await ghApi('git/blobs', 'POST', { content: b64utf8(JSON.stringify(postData, null, 2)), encoding: 'base64' });
+    const indexBlob = await ghApi('git/blobs', 'POST', { content: b64utf8(JSON.stringify({ posts: updatedPosts }, null, 2)), encoding: 'base64' });
+
+    // ── 4. Create new tree with both files ────────────
+    const newTree = await ghApi('git/trees', 'POST', {
+      base_tree: baseTreeSha,
+      tree: [
+        { path: `html/posts/${slug}.json`, mode: '100644', type: 'blob', sha: postBlob.sha },
+        { path: 'html/posts.json',         mode: '100644', type: 'blob', sha: indexBlob.sha }
+      ]
+    });
+
+    // ── 5. Create commit and advance branch ──────────
+    const newCommit = await ghApi('git/commits', 'POST', {
+      message: `post: ${title}`,
+      tree: newTree.sha,
+      parents: [headSha]
+    });
+    await ghApi(`git/refs/heads/${GH_BRANCH}`, 'PATCH', { sha: newCommit.sha });
 
     showToast('Published ✓ — deploying (~1 min)', 'success');
     setTimeout(() => { location.href = 'index.html'; }, 1500);
@@ -291,8 +313,6 @@ function makeExcerpt(content, len = 160) {
     .replace(/[#*_>~\-]/g, '').replace(/\s+/g, ' ').trim()
     .slice(0, len).trimEnd() + (content.length > len ? '...' : '');
 }
-
-function b64encode(str) { return btoa(String.fromCharCode(...new TextEncoder().encode(str))); }
 
 function showErr(el, msg) { el.textContent = msg; el.style.display = 'block'; }
 

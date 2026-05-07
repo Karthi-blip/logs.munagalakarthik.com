@@ -1,14 +1,15 @@
 #!/bin/bash
 # logs.munagalakarthik.com — AWS Infrastructure Setup
 # Run each block one at a time. Copy the output values into myreadme.md as you go.
-# Prerequisites: aws cli configured, correct AWS account
+# Prerequisites: aws cli configured, correct AWS account, jq installed
 
-set -e
+set -euo pipefail
 
 BUCKET="logs.munagalakarthik.com"
 REGION="us-east-1"
 DOMAIN="logs.munagalakarthik.com"
 ROOT_DOMAIN="munagalakarthik.com"
+export AWS_DEFAULT_REGION="$REGION"
 
 # ─────────────────────────────────────────────
 # STEP 1 — S3 Bucket
@@ -39,20 +40,31 @@ CERT_ARN=$(aws acm request-certificate \
   --query "CertificateArn" \
   --output text)
 
+[[ -z "$CERT_ARN" ]] && { echo "ERROR: failed to request certificate"; exit 1; }
 echo "Certificate ARN: $CERT_ARN"
 echo ">>> Save this ↑ in myreadme.md"
 
-# Get the DNS validation CNAME record
-echo ">>> Waiting 10s for cert details..."
-sleep 10
+# Poll until the DNS validation record is ready (can take up to ~30s)
+echo ">>> Waiting for cert validation record to appear..."
+CNAME_RECORD="null"
+for i in $(seq 1 12); do
+  CNAME_RECORD=$(aws acm describe-certificate \
+    --certificate-arn "$CERT_ARN" \
+    --region "$REGION" \
+    --query "Certificate.DomainValidationOptions[0].ResourceRecord" \
+    --output json 2>/dev/null || echo "null")
+  [[ "$CNAME_RECORD" != "null" && -n "$CNAME_RECORD" ]] && break
+  echo "  (attempt $i/12 — waiting 5s)"
+  sleep 5
+done
 
-aws acm describe-certificate \
-  --certificate-arn "$CERT_ARN" \
-  --region "$REGION" \
-  --query "Certificate.DomainValidationOptions[0].ResourceRecord" \
-  --output table
+CNAME_NAME=$(echo "$CNAME_RECORD" | jq -r '.Name')
+CNAME_VALUE=$(echo "$CNAME_RECORD" | jq -r '.Value')
 
-echo ">>> Add the CNAME record above to Route 53 (Step 3 does this automatically)"
+[[ -z "$CNAME_NAME" || "$CNAME_NAME" == "null" ]] && { echo "ERROR: could not get cert CNAME record after 60s"; exit 1; }
+
+echo "CNAME Name:  $CNAME_NAME"
+echo "CNAME Value: $CNAME_VALUE"
 
 # ─────────────────────────────────────────────
 # STEP 3 — Route 53: ACM Validation CNAME
@@ -64,20 +76,8 @@ ZONE_ID=$(aws route53 list-hosted-zones \
   --query "HostedZones[?Name=='${ROOT_DOMAIN}.'].Id" \
   --output text | sed 's|/hostedzone/||')
 
+[[ -z "$ZONE_ID" ]] && { echo "ERROR: hosted zone not found for $ROOT_DOMAIN"; exit 1; }
 echo "Hosted Zone ID: $ZONE_ID"
-
-# Get validation CNAME name and value
-CNAME_NAME=$(aws acm describe-certificate \
-  --certificate-arn "$CERT_ARN" \
-  --region "$REGION" \
-  --query "Certificate.DomainValidationOptions[0].ResourceRecord.Name" \
-  --output text)
-
-CNAME_VALUE=$(aws acm describe-certificate \
-  --certificate-arn "$CERT_ARN" \
-  --region "$REGION" \
-  --query "Certificate.DomainValidationOptions[0].ResourceRecord.Value" \
-  --output text)
 
 echo ">>> Adding ACM validation CNAME to Route 53..."
 
@@ -119,6 +119,8 @@ OAC_ID=$(aws cloudfront create-origin-access-control \
   --query "OriginAccessControl.Id" \
   --output text)
 
+[[ -z "$OAC_ID" ]] && { echo "ERROR: failed to create OAC"; exit 1; }
+
 S3_ORIGIN="${BUCKET}.s3.${REGION}.amazonaws.com"
 
 CF_DIST_ID=$(aws cloudfront create-distribution \
@@ -149,13 +151,7 @@ CF_DIST_ID=$(aws cloudfront create-distribution \
         \"Quantity\": 2,
         \"Items\": [\"GET\", \"HEAD\"]
       },
-      \"ForwardedValues\": {
-        \"QueryString\": false,
-        \"Cookies\": {\"Forward\": \"none\"}
-      },
-      \"MinTTL\": 0,
-      \"DefaultTTL\": 86400,
-      \"MaxTTL\": 31536000,
+      \"CachePolicyId\": \"658327ea-f89d-4fab-a63d-7e88639e58f6\",
       \"Compress\": true,
       \"ResponseHeadersPolicyId\": \"67f7725c-6f97-4210-82d7-5512b31e9d03\"
     },
@@ -186,8 +182,10 @@ CF_DIST_ID=$(aws cloudfront create-distribution \
   --query "Distribution.Id" \
   --output text)
 
+[[ -z "$CF_DIST_ID" ]] && { echo "ERROR: failed to create CloudFront distribution"; exit 1; }
+
 echo "CloudFront Distribution ID: $CF_DIST_ID"
-echo ">>> Save this ↑ in myreadme.md and GitHub secrets"
+echo ">>> Save this ↑ in myreadme.md"
 
 CF_DOMAIN=$(aws cloudfront get-distribution \
   --id "$CF_DIST_ID" \
@@ -219,12 +217,16 @@ aws s3api put-bucket-policy \
     }]
   }"
 
+echo ">>> Waiting for CloudFront distribution to deploy (10-15 min)..."
+aws cloudfront wait distribution-deployed --id "$CF_DIST_ID"
+
 # ─────────────────────────────────────────────
 # STEP 5 — Route 53: logs → CloudFront
 # ─────────────────────────────────────────────
 
 echo ">>> Adding Route 53 A record: logs → CloudFront..."
 
+# Z2FDTNDATAQYW2 is CloudFront's fixed global hosted zone ID (not account-specific)
 aws route53 change-resource-record-sets \
   --hosted-zone-id "$ZONE_ID" \
   --change-batch "{
@@ -276,5 +278,5 @@ echo "  CloudFront Domain      : $CF_DOMAIN"
 echo "  Route 53 Zone ID       : $ZONE_ID"
 echo "════════════════════════════════════════"
 echo ""
-echo "Next: add CF_DIST_ID to GitHub secret CLOUDFRONT_DISTRIBUTION_ID"
-echo "Then: run the first Hugo deploy (see myreadme.md)"
+echo "Next: set the GitHub secret AWS_ROLE_ARN, then push to trigger first deploy."
+echo "Then: verify https://logs.munagalakarthik.com loads."
