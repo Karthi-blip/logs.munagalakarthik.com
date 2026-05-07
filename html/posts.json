@@ -1,6 +1,14 @@
 {
   "posts": [
     {
+      "slug": "hello-world-why-i-started-logs",
+      "title": "Hello, World — Why I Started logs",
+      "date": "2026-05-07",
+      "tags": ["intro", "cloud security", "aws"],
+      "excerpt": "Every cloud security engineer has a moment where they think: I wish someone had written this down. That's why I started logs.",
+      "readTime": 2
+    },
+    {
       "slug": "test",
       "title": "test2",
       "date": "2026-05-07",
