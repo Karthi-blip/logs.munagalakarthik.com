@@ -144,6 +144,155 @@ function hideOverlay() {
   if (main) main.style.visibility = 'visible';
 }
 
+/* ── Tab switching ───────────────────────────────── */
+function switchTab(tab) {
+  const isNew = tab === 'new';
+  document.getElementById('new-post-panel').style.display  = isNew ? '' : 'none';
+  document.getElementById('manage-panel').style.display    = isNew ? 'none' : '';
+  document.getElementById('post-toolbar').style.display    = isNew ? '' : 'none';
+  document.getElementById('tab-new').classList.toggle('active', isNew);
+  document.getElementById('tab-manage').classList.toggle('active', !isNew);
+  if (!isNew) loadManagedPosts();
+}
+
+/* ── Manage Posts ────────────────────────────────── */
+async function loadManagedPosts() {
+  const container = document.getElementById('manage-posts-list');
+  container.innerHTML = `<div class="empty-state"><div class="icon">⏳</div><h3>Loading...</h3></div>`;
+  try {
+    const indexFile = await ghGet('html/posts.json');
+    if (!indexFile) {
+      container.innerHTML = `<div class="empty-state"><div class="icon">✍️</div><h3>No posts yet.</h3></div>`;
+      return;
+    }
+    const posts = JSON.parse(atob(indexFile.content.replace(/\n/g, ''))).posts || [];
+    if (posts.length === 0) {
+      container.innerHTML = `<div class="empty-state"><div class="icon">✍️</div><h3>No posts yet.</h3></div>`;
+      return;
+    }
+    container.innerHTML = posts.map((p, i) => `
+      <div class="manage-post-row">
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;font-size:0.95rem;color:var(--text);margin-bottom:0.3rem;">${esc(p.title)}</div>
+          <div style="font-size:0.8rem;color:var(--muted);display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+            <span>${formatDate(p.date)}</span>
+            ${p.readTime ? `<span>· ${p.readTime} min read</span>` : ''}
+          </div>
+          ${p.tags?.length ? `<div class="tags" style="margin-top:0.4rem;">${p.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>` : ''}
+        </div>
+        <div class="manage-post-actions">
+          <button class="btn btn-secondary manage-edit-btn" data-idx="${i}" style="padding:0.35rem 0.7rem;font-size:0.78rem;">
+            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            Edit
+          </button>
+          <button class="btn btn-danger manage-delete-btn" data-idx="${i}" style="padding:0.35rem 0.7rem;font-size:0.78rem;">
+            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            Delete
+          </button>
+        </div>
+      </div>`).join('');
+
+    container.querySelectorAll('.manage-edit-btn').forEach(btn => {
+      btn.addEventListener('click', () => editPost(posts[+btn.dataset.idx].slug));
+    });
+    container.querySelectorAll('.manage-delete-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = posts[+btn.dataset.idx];
+        confirmDelete(p.slug, p.title);
+      });
+    });
+  } catch (e) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><h3>Failed to load posts</h3><p style="font-size:0.85rem;color:var(--muted);">${esc(e.message)}</p></div>`;
+  }
+}
+
+/* ── Edit post ───────────────────────────────────── */
+async function editPost(slug) {
+  try {
+    showToast('Loading post...', 'success');
+    const file = await ghGet(`html/posts/${slug}.json`);
+    if (!file) { showToast('Post file not found.', 'error'); return; }
+    const post = JSON.parse(atob(file.content.replace(/\n/g, '')));
+    document.getElementById('post-title').value          = post.title   || '';
+    document.getElementById('post-slug').value           = post.slug    || slug;
+    document.getElementById('post-date').value           = post.date    || '';
+    document.getElementById('post-tags').value           = (post.tags   || []).join(', ');
+    document.getElementById('post-content').value        = post.content || '';
+    document.getElementById('admin-h1').textContent      = 'Edit Post';
+    document.getElementById('publish-btn-label').textContent = 'Update';
+    switchTab('new');
+    showToast('Post loaded — edit and republish ✓', 'success');
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+/* ── Delete post ─────────────────────────────────── */
+let _deleteSlug = null;
+
+function confirmDelete(slug, title) {
+  _deleteSlug = slug;
+  document.getElementById('delete-modal-msg').textContent = `"${title}" will be permanently removed.`;
+  document.getElementById('delete-modal').style.display = 'flex';
+}
+
+function closeDeleteModal() {
+  _deleteSlug = null;
+  document.getElementById('delete-modal').style.display = 'none';
+}
+
+async function deletePost() {
+  const slug = _deleteSlug;
+  if (!slug) return;
+  closeDeleteModal();
+
+  const confirmBtn = document.getElementById('delete-confirm-btn');
+  confirmBtn.disabled = true;
+
+  try {
+    showToast('Deleting...', 'success');
+
+    const ref        = await ghApi(`git/refs/heads/${GH_BRANCH}`, 'GET');
+    const headSha    = ref.object.sha;
+    const headCommit = await ghApi(`git/commits/${headSha}`, 'GET');
+    const baseTreeSha = headCommit.tree.sha;
+
+    const existingIndex = await ghGet('html/posts.json');
+    let existingPosts = [];
+    if (existingIndex) {
+      try { existingPosts = JSON.parse(atob(existingIndex.content.replace(/\n/g, ''))).posts || []; }
+      catch (_) {}
+    }
+    const updatedPosts = existingPosts.filter(p => p.slug !== slug);
+    const indexBlob = await ghApi('git/blobs', 'POST', {
+      content: b64utf8(JSON.stringify({ posts: updatedPosts }, null, 2)),
+      encoding: 'base64'
+    });
+
+    const newTree = await ghApi('git/trees', 'POST', {
+      base_tree: baseTreeSha,
+      tree: [
+        { path: 'html/posts.json',         mode: '100644', type: 'blob', sha: indexBlob.sha },
+        { path: `html/posts/${slug}.json`, mode: '100644', type: 'blob', sha: null }
+      ]
+    });
+
+    const newCommit = await ghApi('git/commits', 'POST', {
+      message: `delete: ${slug}`,
+      tree: newTree.sha,
+      parents: [headSha]
+    });
+    await ghApi(`git/refs/heads/${GH_BRANCH}`, 'PATCH', { sha: newCommit.sha });
+
+    showToast('Deleted ✓ — deploying (~1 min)', 'success');
+    loadManagedPosts();
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  } finally {
+    confirmBtn.disabled = false;
+  }
+}
+
 /* ── Slug / Preview ──────────────────────────────── */
 function updateSlug() {
   document.getElementById('post-slug').value = slugify(
@@ -290,6 +439,8 @@ async function publishPost() {
     });
     await ghApi(`git/refs/heads/${GH_BRANCH}`, 'PATCH', { sha: newCommit.sha });
 
+    document.getElementById('admin-h1').textContent         = 'New Post';
+    document.getElementById('publish-btn-label').textContent = 'Publish';
     showToast('Published ✓ — deploying (~1 min)', 'success');
     setTimeout(() => { location.href = 'index.html'; }, 1500);
 
