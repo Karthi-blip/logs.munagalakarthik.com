@@ -218,8 +218,10 @@ async function editPost(slug) {
     document.getElementById('post-date').value           = post.date    || '';
     document.getElementById('post-tags').value           = (post.tags   || []).join(', ');
     document.getElementById('post-content').value        = post.content || '';
-    document.getElementById('admin-h1').textContent      = 'Edit Post';
-    document.getElementById('publish-btn-label').textContent = 'Update';
+    const _h1  = document.getElementById('admin-h1');
+    const _lbl = document.getElementById('publish-btn-label');
+    if (_h1)  _h1.textContent  = 'Edit Post';
+    if (_lbl) _lbl.textContent = 'Update';
     switchTab('new');
     showToast('Post loaded — edit and republish ✓', 'success');
   } catch (e) {
@@ -439,8 +441,6 @@ async function publishPost() {
     });
     await ghApi(`git/refs/heads/${GH_BRANCH}`, 'PATCH', { sha: newCommit.sha });
 
-    document.getElementById('admin-h1').textContent         = 'New Post';
-    document.getElementById('publish-btn-label').textContent = 'Publish';
     showToast('Published ✓ — deploying (~1 min)', 'success');
     setTimeout(() => { location.href = 'index.html'; }, 1500);
 
