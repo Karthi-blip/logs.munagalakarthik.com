@@ -177,7 +177,7 @@ async function loadManagedPosts() {
       container.innerHTML = `<div class="empty-state"><div class="icon">✍️</div><h3>No posts yet.</h3></div>`;
       return;
     }
-    const posts = JSON.parse(atob(indexFile.content.replace(/\n/g, ''))).posts || [];
+    const posts = JSON.parse(b64decode(indexFile.content)).posts || [];
     if (posts.length === 0) {
       container.innerHTML = `<div class="empty-state"><div class="icon">✍️</div><h3>No posts yet.</h3></div>`;
       return;
@@ -224,7 +224,7 @@ async function editPost(slug) {
     showToast('Loading post...', 'success');
     const file = await ghGet(`html/posts/${slug}.json`);
     if (!file) { showToast('Post file not found.', 'error'); return; }
-    const post = JSON.parse(atob(file.content.replace(/\n/g, '')));
+    const post = JSON.parse(b64decode(file.content));
     document.getElementById('post-title').value          = post.title   || '';
     document.getElementById('post-slug').value           = post.slug    || slug;
     document.getElementById('post-date').value           = post.date    || '';
@@ -279,7 +279,7 @@ async function deletePost() {
     // 1. remove from posts.json index (creates commit 1)
     let existingPosts = [];
     if (existingIndex) {
-      try { existingPosts = JSON.parse(atob(existingIndex.content.replace(/\n/g, ''))).posts || []; }
+      try { existingPosts = JSON.parse(b64decode(existingIndex.content)).posts || []; }
       catch (_) {}
     }
     const updatedPosts = existingPosts.filter(p => p.slug !== slug);
@@ -387,6 +387,12 @@ function b64utf8(str) {
   return btoa(String.fromCharCode(...new TextEncoder().encode(str)));
 }
 
+function b64decode(str) {
+  return new TextDecoder().decode(
+    Uint8Array.from(atob(str.replace(/\n/g, '')), c => c.charCodeAt(0))
+  );
+}
+
 /* ── Publish via GitHub API (single atomic commit) ── */
 async function publishPost() {
   const title   = document.getElementById('post-title').value.trim();
@@ -426,7 +432,7 @@ async function publishPost() {
     const existingIndex = await ghGet('html/posts.json');
     let existingPosts = [];
     if (existingIndex) {
-      try { existingPosts = JSON.parse(atob(existingIndex.content.replace(/\n/g, ''))).posts || []; }
+      try { existingPosts = JSON.parse(b64decode(existingIndex.content)).posts || []; }
       catch (_) {}
     }
     const updatedPosts = [
