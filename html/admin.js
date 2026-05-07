@@ -145,8 +145,20 @@ function hideOverlay() {
 }
 
 /* ── Tab switching ───────────────────────────────── */
-function switchTab(tab) {
+let _editingSlug = null;
+
+function switchTab(tab, resetEdit = false) {
   const isNew = tab === 'new';
+  if (resetEdit && isNew) {
+    _editingSlug = null;
+    const slugField = document.getElementById('post-slug');
+    slugField.readOnly = false;
+    slugField.style.opacity = '';
+    const h1  = document.getElementById('admin-h1');
+    const lbl = document.getElementById('publish-btn-label');
+    if (h1)  h1.textContent  = 'New Post';
+    if (lbl) lbl.textContent = 'Publish';
+  }
   document.getElementById('new-post-panel').style.display  = isNew ? '' : 'none';
   document.getElementById('manage-panel').style.display    = isNew ? 'none' : '';
   document.getElementById('post-toolbar').style.display    = isNew ? '' : 'none';
@@ -218,6 +230,10 @@ async function editPost(slug) {
     document.getElementById('post-date').value           = post.date    || '';
     document.getElementById('post-tags').value           = (post.tags   || []).join(', ');
     document.getElementById('post-content').value        = post.content || '';
+    _editingSlug = post.slug || slug;
+    const slugField = document.getElementById('post-slug');
+    slugField.readOnly = true;
+    slugField.style.opacity = '0.55';
     const _h1  = document.getElementById('admin-h1');
     const _lbl = document.getElementById('publish-btn-label');
     if (_h1)  _h1.textContent  = 'Edit Post';
@@ -254,37 +270,34 @@ async function deletePost() {
   try {
     showToast('Deleting...', 'success');
 
-    const ref        = await ghApi(`git/refs/heads/${GH_BRANCH}`, 'GET');
-    const headSha    = ref.object.sha;
-    const headCommit = await ghApi(`git/commits/${headSha}`, 'GET');
-    const baseTreeSha = headCommit.tree.sha;
+    // read both files in parallel before touching anything
+    const [existingIndex, postFile] = await Promise.all([
+      ghGet('html/posts.json'),
+      ghGet(`html/posts/${slug}.json`)
+    ]);
 
-    const existingIndex = await ghGet('html/posts.json');
+    // 1. remove from posts.json index (creates commit 1)
     let existingPosts = [];
     if (existingIndex) {
       try { existingPosts = JSON.parse(atob(existingIndex.content.replace(/\n/g, ''))).posts || []; }
       catch (_) {}
     }
     const updatedPosts = existingPosts.filter(p => p.slug !== slug);
-    const indexBlob = await ghApi('git/blobs', 'POST', {
-      content: b64utf8(JSON.stringify({ posts: updatedPosts }, null, 2)),
-      encoding: 'base64'
-    });
-
-    const newTree = await ghApi('git/trees', 'POST', {
-      base_tree: baseTreeSha,
-      tree: [
-        { path: 'html/posts.json',         mode: '100644', type: 'blob', sha: indexBlob.sha },
-        { path: `html/posts/${slug}.json`, mode: '100644', type: 'blob', sha: null }
-      ]
-    });
-
-    const newCommit = await ghApi('git/commits', 'POST', {
+    await ghApi('contents/html/posts.json', 'PUT', {
       message: `delete: ${slug}`,
-      tree: newTree.sha,
-      parents: [headSha]
+      content: b64utf8(JSON.stringify({ posts: updatedPosts }, null, 2)),
+      sha: existingIndex?.sha,
+      branch: GH_BRANCH
     });
-    await ghApi(`git/refs/heads/${GH_BRANCH}`, 'PATCH', { sha: newCommit.sha });
+
+    // 2. delete the post file (creates commit 2)
+    if (postFile) {
+      await ghApi(`contents/html/posts/${slug}.json`, 'DELETE', {
+        message: `delete: ${slug}`,
+        sha: postFile.sha,
+        branch: GH_BRANCH
+      });
+    }
 
     showToast('Deleted ✓ — deploying (~1 min)', 'success');
     loadManagedPosts();
@@ -297,6 +310,7 @@ async function deletePost() {
 
 /* ── Slug / Preview ──────────────────────────────── */
 function updateSlug() {
+  if (_editingSlug !== null) return; // slug is locked in edit mode
   document.getElementById('post-slug').value = slugify(
     document.getElementById('post-title').value
   );
