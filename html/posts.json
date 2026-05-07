@@ -1,6 +1,14 @@
 {
   "posts": [
     {
+      "slug": "test2",
+      "title": "test2",
+      "date": "2026-05-07",
+      "tags": [],
+      "excerpt": "hello from test2",
+      "readTime": 1
+    },
+    {
       "slug": "test",
       "title": "test",
       "date": "2026-05-07",
