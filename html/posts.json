@@ -2,19 +2,15 @@
   "posts": [
     {
       "slug": "hello-world-why-i-started-logs",
-      "title": "Hi, I'm Karthik — Cloud Security Engineer",
+      "title": "Hi, I'm Karthik â Cloud Security Engineer",
       "date": "2026-05-07",
-      "tags": ["about me", "cloud security", "aws"],
+      "tags": [
+        "about me",
+        "cloud security",
+        "aws"
+      ],
       "excerpt": "Cloud Security Engineer obsessed with AWS, IAM, and making sure the things we build don't end up in a breach report. This is my corner of the internet.",
       "readTime": 2
-    },
-    {
-      "slug": "test",
-      "title": "test2",
-      "date": "2026-05-07",
-      "tags": [],
-      "excerpt": "hello from test2",
-      "readTime": 1
     }
   ]
 }
