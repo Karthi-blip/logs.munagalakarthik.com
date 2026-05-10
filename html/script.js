@@ -161,6 +161,17 @@ async function loadPost() {
 
     document.title = `${post.title} — logs`;
 
+    const postUrl = `https://logs.munagalakarthik.com/post.html?slug=${encodeURIComponent(slug)}`;
+    const desc = post.excerpt || post.content?.slice(0, 160).replace(/[#*`\n]/g, ' ').trim() || '';
+    const setMeta = (sel, val) => { const el = document.querySelector(sel); if (el) el.setAttribute('content', val); };
+    setMeta('meta[name="description"]', desc);
+    setMeta('meta[property="og:title"]', `${post.title} — logs`);
+    setMeta('meta[property="og:description"]', desc);
+    setMeta('meta[property="og:url"]', postUrl);
+    setMeta('meta[name="twitter:title"]', `${post.title} — logs`);
+    setMeta('meta[name="twitter:description"]', desc);
+    document.querySelector('link[rel="canonical"]')?.setAttribute('href', postUrl);
+
     // marked config for security
     marked.setOptions({ breaks: true, gfm: true });
 
@@ -229,3 +240,19 @@ function trackAndShowVisitors() {
     })
     .catch(() => {});
 }
+
+/* ── Theme Toggle ─────────────────────────────────── */
+(function initTheme() {
+  const toggle = document.getElementById('theme-toggle');
+  if (!toggle) return;
+  toggle.addEventListener('click', () => {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    if (isLight) {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('logs-theme', 'dark');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+      localStorage.setItem('logs-theme', 'light');
+    }
+  });
+})();

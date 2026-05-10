@@ -1,6 +1,14 @@
 {
   "posts": [
     {
+      "slug": "iam-privilege-escalation-patterns",
+      "title": "IAM privilege escalation: patterns you'll actually see in the wild",
+      "date": "2026-05-10",
+      "tags": ["aws", "iam", "privilege-escalation", "cloud-security", "red-team"],
+      "excerpt": "AWS IAM privilege escalation isn't about zero-days. It's about abusing legitimate permissions in ways the account owner didn't intend. Here are the patterns that come up most often.",
+      "readTime": 7
+    },
+    {
       "slug": "hello-world-why-i-started-logs",
       "title": "Hi, I'm Karthik - Cloud Security Engineer",
       "date": "2026-05-07",
