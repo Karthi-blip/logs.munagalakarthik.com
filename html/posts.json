@@ -1,6 +1,14 @@
 {
   "posts": [
     {
+      "slug": "cloudtrail-first-queries-suspicious-iam",
+      "title": "Suspicious IAM activity? Five CloudTrail lookups I run first",
+      "date": "2026-05-14",
+      "tags": ["aws", "cloudtrail", "iam", "incident-response", "cloud-security"],
+      "excerpt": "When someone says \"something odd happened in IAM,\" you do not need a fancy SIEM on day one. CloudTrail already has the story — if you know which events to pull first.",
+      "readTime": 6
+    },
+    {
       "slug": "iam-privilege-escalation-patterns",
       "title": "IAM privilege escalation: patterns you'll actually see in the wild",
       "date": "2026-05-10",
@@ -10,15 +18,16 @@
     },
     {
       "slug": "hello-world-why-i-started-logs",
-      "title": "Hi, I'm Karthik - Cloud Security Engineer",
+      "title": "Hi, I'm Karthik - LLM Engineer",
       "date": "2026-05-07",
       "tags": [
         "about me",
-        "cloud security",
+        "llms",
+        "engineering",
         "aws"
       ],
-      "excerpt": "Cloud Security Engineer obsessed with AWS, IAM, and making sure the things we build don't end up in a breach report. This is my corner of the internet.",
-      "readTime": 2
+      "excerpt": "LLM Engineer focused on how models behave in production—evals, tooling, and the boring work that keeps assistants reliable. This is my corner of the internet.",
+      "readTime": 3
     }
   ]
 }
