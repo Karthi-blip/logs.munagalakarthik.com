@@ -18,15 +18,16 @@
     },
     {
       "slug": "hello-world-why-i-started-logs",
-      "title": "Hi, I'm Karthik - LLM Engineer",
+      "title": "Hi, I'm Karthik - LLM & Cloud Security Engineer",
       "date": "2026-05-07",
       "tags": [
         "about me",
         "llms",
+        "cloud security",
         "engineering",
         "aws"
       ],
-      "excerpt": "LLM Engineer focused on how models behave in production—evals, tooling, and the boring work that keeps assistants reliable. This is my corner of the internet.",
+      "excerpt": "LLM Engineer and Cloud Security Engineer—models in production, AWS IAM and guardrails, and the overlap between the two. This is my corner of the internet.",
       "readTime": 3
     }
   ]
