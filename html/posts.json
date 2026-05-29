@@ -1,6 +1,30 @@
 {
   "posts": [
     {
+      "slug": "scp-patterns-every-aws-org",
+      "title": "The SCPs I attach to every AWS org",
+      "date": "2026-05-27",
+      "tags": ["aws", "scp", "organizations", "iam", "cloud-security"],
+      "excerpt": "Service Control Policies are the cheapest, highest-leverage security control AWS gives you. Here are the four I put in place on day one of a new org.",
+      "readTime": 5
+    },
+    {
+      "slug": "prompt-injection-defenses-that-hold",
+      "title": "Prompt injection: the defenses that actually hold up",
+      "date": "2026-05-22",
+      "tags": ["llms", "prompt-injection", "ai-security", "evals", "guardrails"],
+      "excerpt": "Most \"prompt injection defenses\" are wishful thinking dressed up as engineering. Here is the short list of patterns that survive a real red-team week.",
+      "readTime": 6
+    },
+    {
+      "slug": "eventbridge-iam-detection-rules",
+      "title": "EventBridge rules for IAM, without drowning on-call",
+      "date": "2026-05-20",
+      "tags": ["aws", "eventbridge", "iam", "detection-engineering", "cloud-security"],
+      "excerpt": "CloudTrail tells you what happened. EventBridge tells you the moment it happens — if you can write the pattern without paging on every CI deploy.",
+      "readTime": 6
+    },
+    {
       "slug": "cloudtrail-first-queries-suspicious-iam",
       "title": "Suspicious IAM activity? Five CloudTrail lookups I run first",
       "date": "2026-05-14",
