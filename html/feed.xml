@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>logs — Munagala Karthik</title>
+    <link>https://logs.munagalakarthik.com/</link>
+    <atom:link href="https://logs.munagalakarthik.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <description>Notes on LLMs, cloud security, and systems by Munagala Karthik.</description>
+    <language>en-IN</language>
+    <lastBuildDate>Wed, 27 May 2026 00:00:00 +0530</lastBuildDate>
+    <item>
+      <title>The SCPs I attach to every AWS org</title>
+      <link>https://logs.munagalakarthik.com/post.html?slug=scp-patterns-every-aws-org</link>
+      <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=scp-patterns-every-aws-org</guid>
+      <pubDate>Wed, 27 May 2026 00:00:00 +0530</pubDate>
+      <description>Service Control Policies are the cheapest, highest-leverage security control AWS gives you. Here are the four I put in place on day one of a new org.</description>
+    </item>
+    <item>
+      <title>Prompt injection: the defenses that actually hold up</title>
+      <link>https://logs.munagalakarthik.com/post.html?slug=prompt-injection-defenses-that-hold</link>
+      <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=prompt-injection-defenses-that-hold</guid>
+      <pubDate>Fri, 22 May 2026 00:00:00 +0530</pubDate>
+      <description>Most &quot;prompt injection defenses&quot; are wishful thinking dressed up as engineering. Here is the short list of patterns that survive a real red-team week.</description>
+    </item>
+    <item>
+      <title>EventBridge rules for IAM, without drowning on-call</title>
+      <link>https://logs.munagalakarthik.com/post.html?slug=eventbridge-iam-detection-rules</link>
+      <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=eventbridge-iam-detection-rules</guid>
+      <pubDate>Wed, 20 May 2026 00:00:00 +0530</pubDate>
+      <description>CloudTrail tells you what happened. EventBridge tells you the moment it happens — if you can write the pattern without paging on every CI deploy.</description>
+    </item>
+    <item>
+      <title>Suspicious IAM activity? Five CloudTrail lookups I run first</title>
+      <link>https://logs.munagalakarthik.com/post.html?slug=cloudtrail-first-queries-suspicious-iam</link>
+      <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=cloudtrail-first-queries-suspicious-iam</guid>
+      <pubDate>Thu, 14 May 2026 00:00:00 +0530</pubDate>
+      <description>When someone says &quot;something odd happened in IAM,&quot; you do not need a fancy SIEM on day one. CloudTrail already has the story — if you know which events to pull first.</description>
+    </item>
+    <item>
+      <title>IAM privilege escalation: patterns you'll actually see in the wild</title>
+      <link>https://logs.munagalakarthik.com/post.html?slug=iam-privilege-escalation-patterns</link>
+      <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=iam-privilege-escalation-patterns</guid>
+      <pubDate>Sun, 10 May 2026 00:00:00 +0530</pubDate>
+      <description>AWS IAM privilege escalation isn't about zero-days. It's about abusing legitimate permissions in ways the account owner didn't intend. Here are the patterns that come up most often.</description>
+    </item>
+    <item>
+      <title>Hi, I'm Karthik - LLM &amp; Cloud Security Engineer</title>
+      <link>https://logs.munagalakarthik.com/post.html?slug=hello-world-why-i-started-logs</link>
+      <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=hello-world-why-i-started-logs</guid>
+      <pubDate>Thu, 07 May 2026 00:00:00 +0530</pubDate>
+      <description>LLM Engineer and Cloud Security Engineer—models in production, AWS IAM and guardrails, and the overlap between the two. This is my corner of the internet.</description>
+    </item>
+  </channel>
+</rss>

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
   <title>~/logs</title>
   <meta name="description" content="Notes on LLMs, cloud security, and systems by Munagala Karthik.">
   <meta property="og:site_name" content="logs — Munagala Karthik">
@@ -17,13 +18,17 @@
   <meta name="twitter:title" content="~/logs">
   <meta name="twitter:description" content="Notes on LLMs, cloud security, and systems by Munagala Karthik.">
   <meta name="twitter:image" content="https://logs.munagalakarthik.com/og-card.png">
+  <link rel="canonical" href="https://logs.munagalakarthik.com/post.html">
+  <link rel="alternate" type="application/rss+xml" title="logs — Munagala Karthik" href="https://logs.munagalakarthik.com/feed.xml">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" integrity="sha384-wH75j6z1lH97ZOpMOInqhgKzFkAInZPPSPlZpYKYTOqsaizPvhQZmAtLcPKXpLyH" crossorigin="anonymous">
   <link rel="stylesheet" href="style.css">
-  <script>try{var t=localStorage.getItem('logs-theme');if(t==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}</script>
-  <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.9/purify.min.js"></script>
+  <script>try{var t=localStorage.getItem('logs-theme');if(t==='light'||(!t&&matchMedia('(prefers-color-scheme: light)').matches))document.documentElement.setAttribute('data-theme','light')}catch(e){}</script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js" integrity="sha384-odPBjvtXVM/5hOYIr3A1dB+flh0c3wAT3bSesIOqEGmyUA4JoKf/YTWy0XKOYAY7" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.9/purify.min.js" integrity="sha384-3HPB1XT51W3gGRxAmZ+qbZwRpRlFQL632y8x+adAqCr4Wp3TaWwCLSTAJJKbyWEK" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous"></script>
 </head>
 <body>
 

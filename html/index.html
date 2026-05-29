@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.counterapi.dev; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
   <title>~/logs</title>
   <meta name="description" content="Notes on LLMs, cloud security, and systems by Munagala Karthik.">
   <meta property="og:title" content="logs — Munagala Karthik">
@@ -16,14 +17,13 @@
   <meta name="twitter:title" content="logs — Munagala Karthik">
   <meta name="twitter:description" content="Notes on LLMs, cloud security, and systems.">
   <meta name="twitter:image" content="https://logs.munagalakarthik.com/og-card.png">
-  <!-- Google Search Console verification — replace content value after GSC gives you the code -->
-  <meta name="google-site-verification" content="FILL_FROM_GSC">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="canonical" href="https://logs.munagalakarthik.com/">
+  <link rel="alternate" type="application/rss+xml" title="logs — Munagala Karthik" href="https://logs.munagalakarthik.com/feed.xml">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="style.css">
-  <script>try{var t=localStorage.getItem('logs-theme');if(t==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}</script>
+  <script>try{var t=localStorage.getItem('logs-theme');if(t==='light'||(!t&&matchMedia('(prefers-color-scheme: light)').matches))document.documentElement.setAttribute('data-theme','light')}catch(e){}</script>
 </head>
 <body>
 
@@ -119,6 +119,8 @@
     <span>© 2026 <a href="https://munagalakarthik.com" target="_blank" rel="noopener">Munagala Karthik</a></span>
     <span class="footer-dot">·</span>
     <span>All rights reserved</span>
+    <span class="footer-dot">·</span>
+    <span><a href="feed.xml">RSS</a></span>
     <span class="footer-dot">·</span>
     <span id="footer-visitors" style="display:inline-flex;align-items:center;gap:0.3rem;">
       <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
