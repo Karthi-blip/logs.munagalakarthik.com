@@ -147,17 +147,45 @@ function hideOverlay() {
 /* ── Tab switching ───────────────────────────────── */
 let _editingSlug = null;
 
+function resetEditState() {
+  _editingSlug = null;
+  const slugField = document.getElementById('post-slug');
+  slugField.readOnly = false;
+  slugField.style.opacity = '';
+  const h1  = document.getElementById('admin-h1');
+  const lbl = document.getElementById('publish-btn-label');
+  const cancelBtn = document.getElementById('cancel-edit-btn');
+  if (h1)  h1.textContent  = 'New Post';
+  if (lbl) lbl.textContent = 'Publish';
+  if (cancelBtn) cancelBtn.style.display = 'none';
+}
+
+function clearPostForm() {
+  document.getElementById('post-title').value = '';
+  document.getElementById('post-slug').value = '';
+  document.getElementById('post-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('post-tags').value = '';
+  document.getElementById('post-content').value = '';
+  const panel = document.getElementById('preview-panel');
+  const btn   = document.getElementById('preview-btn');
+  if (panel?.classList.contains('visible')) {
+    panel.classList.remove('visible');
+    if (btn) btn.innerHTML = `<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg> Preview`;
+  }
+}
+
+function cancelEdit() {
+  if (_editingSlug === null) return;
+  resetEditState();
+  clearPostForm();
+  switchTab('manage');
+}
+
 function switchTab(tab, resetEdit = false) {
   const isNew = tab === 'new';
   if (resetEdit && isNew) {
-    _editingSlug = null;
-    const slugField = document.getElementById('post-slug');
-    slugField.readOnly = false;
-    slugField.style.opacity = '';
-    const h1  = document.getElementById('admin-h1');
-    const lbl = document.getElementById('publish-btn-label');
-    if (h1)  h1.textContent  = 'New Post';
-    if (lbl) lbl.textContent = 'Publish';
+    resetEditState();
+    clearPostForm();
   }
   document.getElementById('new-post-panel').style.display  = isNew ? '' : 'none';
   document.getElementById('manage-panel').style.display    = isNew ? 'none' : '';
@@ -236,8 +264,10 @@ async function editPost(slug) {
     slugField.style.opacity = '0.55';
     const _h1  = document.getElementById('admin-h1');
     const _lbl = document.getElementById('publish-btn-label');
+    const cancelBtn = document.getElementById('cancel-edit-btn');
     if (_h1)  _h1.textContent  = 'Edit Post';
     if (_lbl) _lbl.textContent = 'Update';
+    if (cancelBtn) cancelBtn.style.display = '';
     switchTab('new');
     showToast('Post loaded — edit and republish ✓', 'success');
   } catch (e) {

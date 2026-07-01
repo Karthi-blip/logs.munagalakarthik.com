@@ -152,6 +152,9 @@
       <button class="admin-tab" id="tab-manage" onclick="switchTab('manage')">Manage Posts</button>
     </div>
     <div class="admin-toolbar" id="post-toolbar">
+      <button class="btn btn-secondary" onclick="cancelEdit()" id="cancel-edit-btn" style="display:none;">
+        Cancel
+      </button>
       <button class="btn btn-secondary" onclick="togglePreview()" id="preview-btn">
         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -301,7 +304,7 @@
 </div>
 
 <script src="script.js?v=2"></script>
-<script src="admin.js?v=2"></script>
+<script src="admin.js?v=3"></script>
 <script>
   startClock();
   initAdmin();
