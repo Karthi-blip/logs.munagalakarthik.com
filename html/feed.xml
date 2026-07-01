@@ -6,7 +6,28 @@
     <atom:link href="https://logs.munagalakarthik.com/feed.xml" rel="self" type="application/rss+xml"/>
     <description>Notes on LLMs, cloud security, and systems by Munagala Karthik.</description>
     <language>en-IN</language>
-    <lastBuildDate>Wed, 27 May 2026 00:00:00 +0530</lastBuildDate>
+    <lastBuildDate>Wed, 01 Jul 2026 00:00:00 +0530</lastBuildDate>
+    <item>
+      <title>LLM evals that catch regressions before users do</title>
+      <link>https://logs.munagalakarthik.com/post.html?slug=llm-evals-that-catch-regressions</link>
+      <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=llm-evals-that-catch-regressions</guid>
+      <pubDate>Sat, 20 Jun 2026 00:00:00 +0530</pubDate>
+      <description>Benchmark scores do not tell you if Tuesday&apos;s prompt change broke your checkout flow. Here is the eval setup I use to catch real regressions in production features.</description>
+    </item>
+    <item>
+      <title>GuardDuty findings worth paging for (and the ones you can mute)</title>
+      <link>https://logs.munagalakarthik.com/post.html?slug=guardduty-findings-worth-paging</link>
+      <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=guardduty-findings-worth-paging</guid>
+      <pubDate>Fri, 12 Jun 2026 00:00:00 +0530</pubDate>
+      <description>GuardDuty is noisy until you decide what actually needs a human in the first ten minutes. Here is how I tier findings so on-call stops ignoring the channel.</description>
+    </item>
+    <item>
+      <title>RAG grounding: what I check before shipping retrieval to users</title>
+      <link>https://logs.munagalakarthik.com/post.html?slug=rag-grounding-before-shipping</link>
+      <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=rag-grounding-before-shipping</guid>
+      <pubDate>Fri, 05 Jun 2026 00:00:00 +0530</pubDate>
+      <description>Retrieval makes answers feel smart fast. It also makes wrong answers feel confident. These are the grounding checks I run before a RAG feature goes live.</description>
+    </item>
     <item>
       <title>The SCPs I attach to every AWS org</title>
       <link>https://logs.munagalakarthik.com/post.html?slug=scp-patterns-every-aws-org</link>

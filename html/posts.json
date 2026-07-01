@@ -1,6 +1,30 @@
 {
   "posts": [
     {
+      "slug": "llm-evals-that-catch-regressions",
+      "title": "LLM evals that catch regressions before users do",
+      "date": "2026-06-20",
+      "tags": ["llms", "evals", "mlops", "production", "engineering"],
+      "excerpt": "Benchmark scores do not tell you if Tuesday's prompt change broke your checkout flow. Here is the eval setup I use to catch real regressions in production features.",
+      "readTime": 6
+    },
+    {
+      "slug": "guardduty-findings-worth-paging",
+      "title": "GuardDuty findings worth paging for (and the ones you can mute)",
+      "date": "2026-06-12",
+      "tags": ["aws", "guardduty", "detection-engineering", "incident-response", "cloud-security"],
+      "excerpt": "GuardDuty is noisy until you decide what actually needs a human in the first ten minutes. Here is how I tier findings so on-call stops ignoring the channel.",
+      "readTime": 5
+    },
+    {
+      "slug": "rag-grounding-before-shipping",
+      "title": "RAG grounding: what I check before shipping retrieval to users",
+      "date": "2026-06-05",
+      "tags": ["llms", "rag", "ai-security", "evals", "production"],
+      "excerpt": "Retrieval makes answers feel smart fast. It also makes wrong answers feel confident. These are the grounding checks I run before a RAG feature goes live.",
+      "readTime": 6
+    },
+    {
       "slug": "scp-patterns-every-aws-org",
       "title": "The SCPs I attach to every AWS org",
       "date": "2026-05-27",
