@@ -141,11 +141,11 @@ async function loadPosts() {
           ${(activeTag || query) ? `<a class="clear-filter" href="index.html">Clear</a>` : ''}
         </form>
         <div class="tag-filter" aria-label="Filter by tag">
-          <a class="tag tag-link${activeTag ? '' : ' active'}" href="index.html">all</a>
-          ${allTags.map(tag => `<a class="tag tag-link${tag === activeTag ? ' active' : ''}" href="index.html?tag=${encodeURIComponent(tag)}${query ? `&q=${encodeURIComponent(query)}` : ''}">${esc(tag)}</a>`).join('')}
+          <a class="tag tag-link${activeTag ? '' : ' active'}" href="index.html">All</a>
+          ${allTags.map(tag => `<a class="tag tag-link${tag === activeTag ? ' active' : ''}" href="index.html?tag=${encodeURIComponent(tag)}${query ? `&q=${encodeURIComponent(query)}` : ''}">${esc(formatTagLabel(tag))}</a>`).join('')}
         </div>
       </section>
-      <div class="posts-results">${posts.length} ${posts.length === 1 ? 'post' : 'posts'}${activeTag ? ` tagged ${esc(activeTag)}` : ''}${query ? ` matching "${esc(query)}"` : ''}</div>
+      <div class="posts-results">${posts.length} ${posts.length === 1 ? 'post' : 'posts'}${activeTag ? ` tagged ${esc(formatTagLabel(activeTag))}` : ''}${query ? ` matching "${esc(query)}"` : ''}</div>
       <div class="posts-list-inner">
         ${posts.length ? posts.map(renderPostCard).join('') : `
           <div class="empty-state">
@@ -179,7 +179,7 @@ function renderPostCard(post) {
         <span class="read-more">Read more →</span>
       </a>
       <div class="tags" aria-label="Tags for ${esc(post.title)}">
-        ${(post.tags || []).map(t => `<a class="tag tag-link" href="index.html?tag=${encodeURIComponent(t)}">${esc(t)}</a>`).join('')}
+        ${(post.tags || []).map(t => `<a class="tag tag-link" href="index.html?tag=${encodeURIComponent(t)}">${esc(formatTagLabel(t))}</a>`).join('')}
       </div>
     </article>`;
 }
@@ -231,7 +231,7 @@ async function loadPost() {
             <span>${formatDate(post.date)}</span>
             ${post.readTime ? `<span>· ${post.readTime} min read</span>` : ''}
             <div class="tags">
-              ${(post.tags || []).map(t => `<a class="tag tag-link" href="index.html?tag=${encodeURIComponent(t)}">${esc(t)}</a>`).join('')}
+              ${(post.tags || []).map(t => `<a class="tag tag-link" href="index.html?tag=${encodeURIComponent(t)}">${esc(formatTagLabel(t))}</a>`).join('')}
             </div>
           </div>
         </div>
@@ -255,6 +255,21 @@ function formatDate(dateStr) {
   if (!dateStr) return '';
   const d = new Date(dateStr + 'T00:00:00');
   return d.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function formatTagLabel(tag) {
+  if (!tag) return '';
+  const acronyms = {
+    aws: 'AWS',
+    iam: 'IAM',
+    scp: 'SCP',
+    rag: 'RAG',
+    llms: 'LLMs',
+    mlops: 'MLOps'
+  };
+  const lower = tag.toLowerCase();
+  if (acronyms[lower]) return acronyms[lower];
+  return lower.replace(/(^|[\s-])(\w)/g, (_, sep, char) => sep + char.toUpperCase());
 }
 
 function esc(str) {
