@@ -6,6 +6,24 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://logs.munagalakarthik.com/post.html?slug=agent-tool-permissions-least-privilege</loc>
+    <lastmod>2026-07-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://logs.munagalakarthik.com/post.html?slug=bedrock-logging-what-to-capture</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://logs.munagalakarthik.com/post.html?slug=access-analyzer-findings-worth-fixing</loc>
+    <lastmod>2026-07-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://logs.munagalakarthik.com/post.html?slug=llm-evals-that-catch-regressions</loc>
     <lastmod>2026-06-20</lastmod>
     <changefreq>monthly</changefreq>

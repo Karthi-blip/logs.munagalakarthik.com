@@ -1,6 +1,30 @@
 {
   "posts": [
     {
+      "slug": "agent-tool-permissions-least-privilege",
+      "title": "Least privilege for LLM tool calling (without breaking the demo)",
+      "date": "2026-07-15",
+      "tags": ["llms", "agents", "iam", "ai-security", "production"],
+      "excerpt": "Giving a model a tool is giving it an API. Here is how I scope agent permissions so the demo still works and a prompt injection cannot empty the bucket.",
+      "readTime": 6
+    },
+    {
+      "slug": "bedrock-logging-what-to-capture",
+      "title": "What I log when Bedrock hits production",
+      "date": "2026-07-08",
+      "tags": ["aws", "bedrock", "llms", "observability", "cloud-security"],
+      "excerpt": "Model calls without logs are demos. Here is the minimum logging and retention setup I put in place before a Bedrock feature leaves staging.",
+      "readTime": 5
+    },
+    {
+      "slug": "access-analyzer-findings-worth-fixing",
+      "title": "IAM Access Analyzer: findings worth fixing this sprint",
+      "date": "2026-07-01",
+      "tags": ["aws", "iam", "access-analyzer", "cloud-security", "hardening"],
+      "excerpt": "Access Analyzer will drown you in noise if you treat every finding equally. Here is the short list I fix first — and the ones I deliberately defer.",
+      "readTime": 5
+    },
+    {
       "slug": "llm-evals-that-catch-regressions",
       "title": "LLM evals that catch regressions before users do",
       "date": "2026-06-20",
