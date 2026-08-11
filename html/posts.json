@@ -122,17 +122,20 @@
     },
     {
       "slug": "hello-world-why-i-started-logs",
-      "title": "Hi, I'm Karthik - LLM & Cloud Security Engineer",
+      "title": "Hi, I'm Karthik - LLM, Agents & Cloud Security",
       "date": "2026-05-07",
       "tags": [
         "about me",
         "llms",
+        "agents",
         "cloud security",
+        "kubernetes",
+        "ansible",
         "engineering",
         "aws"
       ],
-      "excerpt": "LLM Engineer and Cloud Security Engineer—models in production, AWS IAM and guardrails, and the overlap between the two. This is my corner of the internet.",
-      "readTime": 3
+      "excerpt": "LLM Engineer and Cloud Security Engineer—shipping model-backed features, learning agentic AI, and hardening the AWS, Kubernetes, and Ansible layers underneath. This is my corner of the internet.",
+      "readTime": 4
     }
   ]
 }

@@ -4,7 +4,7 @@
     <title>logs — Munagala Karthik</title>
     <link>https://logs.munagalakarthik.com/</link>
     <atom:link href="https://logs.munagalakarthik.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <description>Notes on LLMs, cloud security, and systems by Munagala Karthik.</description>
+    <description>Notes on LLMs, agentic AI, cloud security, and platform automation by Munagala Karthik.</description>
     <language>en-IN</language>
     <lastBuildDate>Tue, 11 Aug 2026 00:00:00 +0530</lastBuildDate>
     <item>
@@ -113,11 +113,11 @@
       <description>AWS IAM privilege escalation isn't about zero-days. It's about abusing legitimate permissions in ways the account owner didn't intend. Here are the patterns that come up most often.</description>
     </item>
     <item>
-      <title>Hi, I'm Karthik - LLM &amp; Cloud Security Engineer</title>
+      <title>Hi, I'm Karthik - LLM, Agents &amp; Cloud Security</title>
       <link>https://logs.munagalakarthik.com/post.html?slug=hello-world-why-i-started-logs</link>
       <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=hello-world-why-i-started-logs</guid>
       <pubDate>Thu, 07 May 2026 00:00:00 +0530</pubDate>
-      <description>LLM Engineer and Cloud Security Engineer—models in production, AWS IAM and guardrails, and the overlap between the two. This is my corner of the internet.</description>
+      <description>LLM Engineer and Cloud Security Engineer—shipping model-backed features, learning agentic AI, and hardening the AWS, Kubernetes, and Ansible layers underneath. This is my corner of the internet.</description>
     </item>
   </channel>
 </rss>
