@@ -6,7 +6,35 @@
     <atom:link href="https://logs.munagalakarthik.com/feed.xml" rel="self" type="application/rss+xml"/>
     <description>Notes on LLMs, cloud security, and systems by Munagala Karthik.</description>
     <language>en-IN</language>
-    <lastBuildDate>Fri, 17 Jul 2026 00:00:00 +0530</lastBuildDate>
+    <lastBuildDate>Tue, 11 Aug 2026 00:00:00 +0530</lastBuildDate>
+    <item>
+      <title>KMS key policies people get wrong (and how I write them)</title>
+      <link>https://logs.munagalakarthik.com/post.html?slug=kms-key-policies-people-get-wrong</link>
+      <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=kms-key-policies-people-get-wrong</guid>
+      <pubDate>Tue, 11 Aug 2026 00:00:00 +0530</pubDate>
+      <description>A CMK with a loose key policy is encryption theatre. Here are the mistakes I see most often — and the patterns I use so decrypt is intentional, not ambient.</description>
+    </item>
+    <item>
+      <title>Shadow traffic before you ship a prompt change</title>
+      <link>https://logs.munagalakarthik.com/post.html?slug=shadow-traffic-before-prompt-deploys</link>
+      <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=shadow-traffic-before-prompt-deploys</guid>
+      <pubDate>Wed, 05 Aug 2026 00:00:00 +0530</pubDate>
+      <description>Unit tests on golden prompts miss the weird traffic that shows up on Monday morning. Here is how I shadow new prompts and models against live traffic without users eating the regressions.</description>
+    </item>
+    <item>
+      <title>Security Hub: how I triage findings without living in the console</title>
+      <link>https://logs.munagalakarthik.com/post.html?slug=security-hub-findings-triage</link>
+      <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=security-hub-findings-triage</guid>
+      <pubDate>Wed, 29 Jul 2026 00:00:00 +0530</pubDate>
+      <description>Security Hub aggregates CIS, Foundational, and partner findings into one firehose. Here is the triage loop I use so the dashboard becomes a work queue, not wallpaper.</description>
+    </item>
+    <item>
+      <title>LLM API keys: secret patterns that survive a leak week</title>
+      <link>https://logs.munagalakarthik.com/post.html?slug=llm-api-keys-secrets-that-survive</link>
+      <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=llm-api-keys-secrets-that-survive</guid>
+      <pubDate>Wed, 22 Jul 2026 00:00:00 +0530</pubDate>
+      <description>A leaked OpenAI or Bedrock credential is not a theoretical risk — it is a credit-card-shaped incident. Here is how I store, scope, and rotate model keys so one paste into a ticket does not empty the budget.</description>
+    </item>
     <item>
       <title>Least privilege for LLM tool calling (without breaking the demo)</title>
       <link>https://logs.munagalakarthik.com/post.html?slug=agent-tool-permissions-least-privilege</link>

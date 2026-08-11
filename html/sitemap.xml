@@ -6,6 +6,30 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://logs.munagalakarthik.com/post.html?slug=kms-key-policies-people-get-wrong</loc>
+    <lastmod>2026-08-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://logs.munagalakarthik.com/post.html?slug=shadow-traffic-before-prompt-deploys</loc>
+    <lastmod>2026-08-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://logs.munagalakarthik.com/post.html?slug=security-hub-findings-triage</loc>
+    <lastmod>2026-07-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://logs.munagalakarthik.com/post.html?slug=llm-api-keys-secrets-that-survive</loc>
+    <lastmod>2026-07-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://logs.munagalakarthik.com/post.html?slug=agent-tool-permissions-least-privilege</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
