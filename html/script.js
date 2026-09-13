@@ -1,85 +1,3 @@
-/* ── Boot Screen ──────────────────────────────────── */
-(function () {
-  const bootScreen = document.getElementById('boot-screen');
-  const bootText   = document.getElementById('boot-text');
-  if (!bootScreen || !bootText) return;
-
-  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const alreadyBooted = sessionStorage.getItem('logs-booted') === '1';
-
-  if (prefersReduced || alreadyBooted) {
-    bootScreen.style.display = 'none';
-    return;
-  }
-
-  document.body.style.overflow = 'hidden';
-
-  const lines = [
-    "INIT: logs.munagalakarthik.com booting...",
-    "[ <span style='color:#3fb950'>OK</span> ] Mounting filesystem...",
-    "Loading security modules... <span style='color:#8b949e'>[proxy]</span>",
-    "[ <span style='color:#3fb950'>OK</span> ] System ready. Loading posts..."
-  ];
-
-  let idx = 0;
-  function addLine() {
-    if (idx < lines.length) {
-      bootText.innerHTML += lines[idx] + '<br>';
-      idx++;
-      setTimeout(addLine, Math.random() * 150 + 80);
-    } else {
-      setTimeout(() => {
-        bootScreen.style.opacity = '0';
-        setTimeout(() => {
-          bootScreen.style.display = 'none';
-          document.body.style.overflow = '';
-          sessionStorage.setItem('logs-booted', '1');
-        }, 600);
-      }, 450);
-    }
-  }
-  setTimeout(addLine, 200);
-})();
-
-/* ── Custom Cursor ─────────────────────────────── */
-(function () {
-  if (window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
-
-  const cursor = document.getElementById('cursor');
-  const dot    = document.getElementById('cursor-dot');
-  if (!cursor || !dot) return;
-
-  let mx = innerWidth / 2, my = innerHeight / 2;
-  let cx = mx, cy = my;
-
-  document.addEventListener('mousemove', e => {
-    mx = e.clientX; my = e.clientY;
-    dot.style.left = mx + 'px';
-    dot.style.top  = my + 'px';
-  });
-
-  (function lagCursor() {
-    cx += (mx - cx) * 0.1;
-    cy += (my - cy) * 0.1;
-    cursor.style.left = cx + 'px';
-    cursor.style.top  = cy + 'px';
-    requestAnimationFrame(lagCursor);
-  })();
-
-  document.querySelectorAll('a, button').forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      cursor.style.transform    = 'translate(-50%,-50%) scale(2.2)';
-      cursor.style.borderColor  = '#aa66ff';
-      cursor.style.background   = 'rgba(170,102,255,0.08)';
-    });
-    el.addEventListener('mouseleave', () => {
-      cursor.style.transform    = 'translate(-50%,-50%) scale(1)';
-      cursor.style.borderColor  = '#00d4ff';
-      cursor.style.background   = 'transparent';
-    });
-  });
-})();
-
 /* ── Clock ────────────────────────────────────────── */
 function startClock() {
   function tick() {
@@ -87,10 +5,8 @@ function startClock() {
     const timeStr = ist.toLocaleTimeString('en-IN', {
       hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
     });
-    // Sidebar clock
     const el = document.getElementById('clock');
     if (el) el.textContent = timeStr;
-    // Status bar clock
     const sb = document.getElementById('status-clock');
     if (sb) sb.textContent = timeStr + ' IST';
   }
@@ -124,7 +40,6 @@ async function loadPosts() {
     if (allPosts.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <div class="icon">✍</div>
           <h3>No posts yet</h3>
           <p>Check back soon.</p>
         </div>`;
@@ -136,7 +51,7 @@ async function loadPosts() {
         <form class="posts-search" action="index.html" method="get">
           ${activeTag ? `<input type="hidden" name="tag" value="${esc(activeTag)}">` : ''}
           <label class="sr-only" for="post-search">Search posts</label>
-          <input id="post-search" name="q" type="search" placeholder="Search posts, tags, topics..." value="${esc(query)}">
+          <input id="post-search" name="q" type="search" placeholder="Search posts, tags, topics…" value="${esc(query)}">
           <button class="btn btn-secondary" type="submit">Search</button>
           ${(activeTag || query) ? `<a class="clear-filter" href="index.html">Clear</a>` : ''}
         </form>
@@ -149,7 +64,6 @@ async function loadPosts() {
       <div class="posts-list-inner">
         ${posts.length ? posts.map(renderPostCard).join('') : `
           <div class="empty-state">
-            <div class="icon">⌕</div>
             <h3>No matching posts</h3>
             <p>Try clearing the search or picking another tag.</p>
           </div>`}
@@ -158,7 +72,6 @@ async function loadPosts() {
   } catch (e) {
     container.innerHTML = `
       <div class="empty-state">
-        <div class="icon">⚠</div>
         <h3>Could not load posts</h3>
         <p>${esc(e.message)}</p>
       </div>`;
@@ -173,7 +86,7 @@ function renderPostCard(post) {
         <span class="post-card-title">${esc(post.title)}</span>
         <span class="post-card-meta">
           <span>${formatDate(post.date)}</span>
-          ${post.readTime ? `<span class="dot">${post.readTime} min read</span>` : ''}
+          ${post.readTime ? `<span>· ${post.readTime} min read</span>` : ''}
         </span>
         ${post.excerpt ? `<span class="post-card-excerpt">${esc(post.excerpt)}</span>` : ''}
         <span class="read-more">Read more →</span>
@@ -221,6 +134,9 @@ async function loadPost() {
     document.querySelector('link[rel="canonical"]')?.setAttribute('href', postUrl);
     renderPostJsonLd(post, postUrl, desc);
 
+    const statusSection = document.getElementById('status-section');
+    if (statusSection) statusSection.textContent = '// ' + (slug.length > 28 ? slug.slice(0, 28) + '…' : slug).toUpperCase();
+
     marked.setOptions({ breaks: true, gfm: true });
 
     container.innerHTML = `
@@ -243,7 +159,6 @@ async function loadPost() {
   } catch (e) {
     container.innerHTML = `
       <div class="empty-state">
-        <div class="icon">🔍</div>
         <h3>Post not found</h3>
         <p><a href="index.html">← Back to all posts</a></p>
       </div>`;
@@ -375,14 +290,9 @@ function enhanceRenderedCode(root) {
   });
 }
 
-function estimateReadTime(content) {
-  const words = (content || '').trim().split(/\s+/).length;
-  return Math.max(1, Math.round(words / 200));
-}
-
 /* ── Visitor tracking (global, cross-device) ───────── */
 function trackAndShowVisitors() {
-  const footerEl  = document.getElementById('footer-visit-count');
+  const footerEl = document.getElementById('footer-visit-count');
   if (!footerEl) return;
 
   const cachedCount = sessionStorage.getItem('logs-visit-count');
@@ -390,7 +300,7 @@ function trackAndShowVisitors() {
 
   if (sessionStorage.getItem('logs-counted-visit') === '1') return;
 
-  const ctrl    = new AbortController();
+  const ctrl = new AbortController();
   const timeout = setTimeout(() => ctrl.abort(), 4000);
 
   fetch('https://api.counterapi.dev/v1/logs.munagalakarthik.com/visitors/up', { signal: ctrl.signal })
