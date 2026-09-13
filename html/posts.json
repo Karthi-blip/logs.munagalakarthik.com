@@ -1,10 +1,58 @@
 {
   "posts": [
     {
+      "slug": "agentic-rag-without-the-mess",
+      "title": "Agentic RAG without turning retrieval into a confused intern",
+      "date": "2026-09-13",
+      "tags": [
+        "llms",
+        "rag",
+        "agents",
+        "ai-engineering",
+        "production"
+      ],
+      "excerpt": "Giving a retriever an agent loop can help hard questions — or burn tokens while the model googles itself in circles. Here is how I add tool-backed retrieval without losing control.",
+      "readTime": 7
+    },
+    {
+      "slug": "llm-routing-small-vs-frontier",
+      "title": "LLM routing: when I use a small model vs a frontier one",
+      "date": "2026-09-10",
+      "tags": [
+        "llms",
+        "mlops",
+        "cost",
+        "production",
+        "ai-engineering"
+      ],
+      "excerpt": "Sending every request to the biggest model is an expensive default. Here is the routing playbook I use so easy work stays cheap and hard work still gets a strong model.",
+      "readTime": 6
+    },
+    {
+      "slug": "hybrid-rag-search-that-actually-retrieves",
+      "title": "Hybrid RAG search: sparse + dense so the right doc shows up",
+      "date": "2026-09-07",
+      "tags": [
+        "llms",
+        "rag",
+        "search",
+        "embeddings",
+        "production"
+      ],
+      "excerpt": "Dense-only retrieval misses exact IDs, error codes, and product names. Keyword-only misses paraphrases. Here is the hybrid search setup I use so RAG finds the paragraph users meant.",
+      "readTime": 6
+    },
+    {
       "slug": "kms-key-policies-people-get-wrong",
       "title": "KMS key policies people get wrong (and how I write them)",
       "date": "2026-08-11",
-      "tags": ["aws", "kms", "encryption", "iam", "cloud-security"],
+      "tags": [
+        "aws",
+        "kms",
+        "encryption",
+        "iam",
+        "cloud-security"
+      ],
       "excerpt": "A CMK with a loose key policy is encryption theatre. Here are the mistakes I see most often — and the patterns I use so decrypt is intentional, not ambient.",
       "readTime": 6
     },
@@ -12,23 +60,69 @@
       "slug": "shadow-traffic-before-prompt-deploys",
       "title": "Shadow traffic before you ship a prompt change",
       "date": "2026-08-05",
-      "tags": ["llms", "evals", "mlops", "production", "engineering"],
+      "tags": [
+        "llms",
+        "evals",
+        "mlops",
+        "production",
+        "engineering"
+      ],
       "excerpt": "Unit tests on golden prompts miss the weird traffic that shows up on Monday morning. Here is how I shadow new prompts and models against live traffic without users eating the regressions.",
       "readTime": 6
+    },
+    {
+      "slug": "security-hub-findings-worth-fixing",
+      "title": "Security Hub: the findings I fix before the rest of the backlog",
+      "date": "2026-07-29",
+      "tags": [
+        "aws",
+        "security-hub",
+        "cloud-security",
+        "hardening",
+        "compliance"
+      ],
+      "excerpt": "Security Hub aggregates everything and prioritizes nothing useful until you do. Here is the cut of findings that actually reduce risk in the next two weeks.",
+      "readTime": 5
     },
     {
       "slug": "security-hub-findings-triage",
       "title": "Security Hub: how I triage findings without living in the console",
       "date": "2026-07-29",
-      "tags": ["aws", "security-hub", "cloud-security", "detection-engineering", "hardening"],
+      "tags": [
+        "aws",
+        "security-hub",
+        "cloud-security",
+        "detection-engineering",
+        "hardening"
+      ],
       "excerpt": "Security Hub aggregates CIS, Foundational, and partner findings into one firehose. Here is the triage loop I use so the dashboard becomes a work queue, not wallpaper.",
       "readTime": 5
+    },
+    {
+      "slug": "pii-redaction-before-the-model",
+      "title": "Redact PII before it hits the model — not after the incident",
+      "date": "2026-07-22",
+      "tags": [
+        "llms",
+        "privacy",
+        "pii",
+        "ai-security",
+        "production"
+      ],
+      "excerpt": "Once a phone number is in the prompt, it is in the provider logs, the cache, and whoever has debug access. Here is the redaction path I put in front of every model call that touches user data.",
+      "readTime": 6
     },
     {
       "slug": "llm-api-keys-secrets-that-survive",
       "title": "LLM API keys: secret patterns that survive a leak week",
       "date": "2026-07-22",
-      "tags": ["llms", "secrets", "aws", "ai-security", "production"],
+      "tags": [
+        "llms",
+        "secrets",
+        "aws",
+        "ai-security",
+        "production"
+      ],
       "excerpt": "A leaked OpenAI or Bedrock credential is not a theoretical risk — it is a credit-card-shaped incident. Here is how I store, scope, and rotate model keys so one paste into a ticket does not empty the budget.",
       "readTime": 6
     },
@@ -36,7 +130,13 @@
       "slug": "agent-tool-permissions-least-privilege",
       "title": "Least privilege for LLM tool calling (without breaking the demo)",
       "date": "2026-07-15",
-      "tags": ["llms", "agents", "iam", "ai-security", "production"],
+      "tags": [
+        "llms",
+        "agents",
+        "iam",
+        "ai-security",
+        "production"
+      ],
       "excerpt": "Giving a model a tool is giving it an API. Here is how I scope agent permissions so the demo still works and a prompt injection cannot empty the bucket.",
       "readTime": 6
     },
@@ -44,7 +144,13 @@
       "slug": "bedrock-logging-what-to-capture",
       "title": "What I log when Bedrock hits production",
       "date": "2026-07-08",
-      "tags": ["aws", "bedrock", "llms", "observability", "cloud-security"],
+      "tags": [
+        "aws",
+        "bedrock",
+        "llms",
+        "observability",
+        "cloud-security"
+      ],
       "excerpt": "Model calls without logs are demos. Here is the minimum logging and retention setup I put in place before a Bedrock feature leaves staging.",
       "readTime": 5
     },
@@ -52,7 +158,13 @@
       "slug": "access-analyzer-findings-worth-fixing",
       "title": "IAM Access Analyzer: findings worth fixing this sprint",
       "date": "2026-07-01",
-      "tags": ["aws", "iam", "access-analyzer", "cloud-security", "hardening"],
+      "tags": [
+        "aws",
+        "iam",
+        "access-analyzer",
+        "cloud-security",
+        "hardening"
+      ],
       "excerpt": "Access Analyzer will drown you in noise if you treat every finding equally. Here is the short list I fix first — and the ones I deliberately defer.",
       "readTime": 5
     },
@@ -60,7 +172,13 @@
       "slug": "llm-evals-that-catch-regressions",
       "title": "LLM evals that catch regressions before users do",
       "date": "2026-06-20",
-      "tags": ["llms", "evals", "mlops", "production", "engineering"],
+      "tags": [
+        "llms",
+        "evals",
+        "mlops",
+        "production",
+        "engineering"
+      ],
       "excerpt": "Benchmark scores do not tell you if Tuesday's prompt change broke your checkout flow. Here is the eval setup I use to catch real regressions in production features.",
       "readTime": 6
     },
@@ -68,7 +186,13 @@
       "slug": "guardduty-findings-worth-paging",
       "title": "GuardDuty findings worth paging for (and the ones you can mute)",
       "date": "2026-06-12",
-      "tags": ["aws", "guardduty", "detection-engineering", "incident-response", "cloud-security"],
+      "tags": [
+        "aws",
+        "guardduty",
+        "detection-engineering",
+        "incident-response",
+        "cloud-security"
+      ],
       "excerpt": "GuardDuty is noisy until you decide what actually needs a human in the first ten minutes. Here is how I tier findings so on-call stops ignoring the channel.",
       "readTime": 5
     },
@@ -76,7 +200,13 @@
       "slug": "rag-grounding-before-shipping",
       "title": "RAG grounding: what I check before shipping retrieval to users",
       "date": "2026-06-05",
-      "tags": ["llms", "rag", "ai-security", "evals", "production"],
+      "tags": [
+        "llms",
+        "rag",
+        "ai-security",
+        "evals",
+        "production"
+      ],
       "excerpt": "Retrieval makes answers feel smart fast. It also makes wrong answers feel confident. These are the grounding checks I run before a RAG feature goes live.",
       "readTime": 6
     },
@@ -84,7 +214,13 @@
       "slug": "scp-patterns-every-aws-org",
       "title": "The SCPs I attach to every AWS org",
       "date": "2026-05-27",
-      "tags": ["aws", "scp", "organizations", "iam", "cloud-security"],
+      "tags": [
+        "aws",
+        "scp",
+        "organizations",
+        "iam",
+        "cloud-security"
+      ],
       "excerpt": "Service Control Policies are the cheapest, highest-leverage security control AWS gives you. Here are the four I put in place on day one of a new org.",
       "readTime": 5
     },
@@ -92,7 +228,13 @@
       "slug": "prompt-injection-defenses-that-hold",
       "title": "Prompt injection: the defenses that actually hold up",
       "date": "2026-05-22",
-      "tags": ["llms", "prompt-injection", "ai-security", "evals", "guardrails"],
+      "tags": [
+        "llms",
+        "prompt-injection",
+        "ai-security",
+        "evals",
+        "guardrails"
+      ],
       "excerpt": "Most \"prompt injection defenses\" are wishful thinking dressed up as engineering. Here is the short list of patterns that survive a real red-team week.",
       "readTime": 6
     },
@@ -100,7 +242,13 @@
       "slug": "eventbridge-iam-detection-rules",
       "title": "EventBridge rules for IAM, without drowning on-call",
       "date": "2026-05-20",
-      "tags": ["aws", "eventbridge", "iam", "detection-engineering", "cloud-security"],
+      "tags": [
+        "aws",
+        "eventbridge",
+        "iam",
+        "detection-engineering",
+        "cloud-security"
+      ],
       "excerpt": "CloudTrail tells you what happened. EventBridge tells you the moment it happens — if you can write the pattern without paging on every CI deploy.",
       "readTime": 6
     },
@@ -108,7 +256,13 @@
       "slug": "cloudtrail-first-queries-suspicious-iam",
       "title": "Suspicious IAM activity? Five CloudTrail lookups I run first",
       "date": "2026-05-14",
-      "tags": ["aws", "cloudtrail", "iam", "incident-response", "cloud-security"],
+      "tags": [
+        "aws",
+        "cloudtrail",
+        "iam",
+        "incident-response",
+        "cloud-security"
+      ],
       "excerpt": "When someone says \"something odd happened in IAM,\" you do not need a fancy SIEM on day one. CloudTrail already has the story — if you know which events to pull first.",
       "readTime": 6
     },
@@ -116,7 +270,13 @@
       "slug": "iam-privilege-escalation-patterns",
       "title": "IAM privilege escalation: patterns you'll actually see in the wild",
       "date": "2026-05-10",
-      "tags": ["aws", "iam", "privilege-escalation", "cloud-security", "red-team"],
+      "tags": [
+        "aws",
+        "iam",
+        "privilege-escalation",
+        "cloud-security",
+        "red-team"
+      ],
       "excerpt": "AWS IAM privilege escalation isn't about zero-days. It's about abusing legitimate permissions in ways the account owner didn't intend. Here are the patterns that come up most often.",
       "readTime": 7
     },

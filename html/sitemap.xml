@@ -6,6 +6,24 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://logs.munagalakarthik.com/post.html?slug=agentic-rag-without-the-mess</loc>
+    <lastmod>2026-09-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://logs.munagalakarthik.com/post.html?slug=llm-routing-small-vs-frontier</loc>
+    <lastmod>2026-09-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://logs.munagalakarthik.com/post.html?slug=hybrid-rag-search-that-actually-retrieves</loc>
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://logs.munagalakarthik.com/post.html?slug=kms-key-policies-people-get-wrong</loc>
     <lastmod>2026-08-11</lastmod>
     <changefreq>monthly</changefreq>
@@ -18,8 +36,20 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://logs.munagalakarthik.com/post.html?slug=security-hub-findings-worth-fixing</loc>
+    <lastmod>2026-07-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://logs.munagalakarthik.com/post.html?slug=security-hub-findings-triage</loc>
     <lastmod>2026-07-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://logs.munagalakarthik.com/post.html?slug=pii-redaction-before-the-model</loc>
+    <lastmod>2026-07-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

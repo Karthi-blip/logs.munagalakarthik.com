@@ -1,0 +1,15 @@
+{
+  "slug": "llm-routing-small-vs-frontier",
+  "title": "LLM routing: when I use a small model vs a frontier one",
+  "date": "2026-09-10",
+  "tags": [
+    "llms",
+    "mlops",
+    "cost",
+    "production",
+    "ai-engineering"
+  ],
+  "excerpt": "Sending every request to the biggest model is an expensive default. Here is the routing playbook I use so easy work stays cheap and hard work still gets a strong model.",
+  "readTime": 6,
+  "content": "Frontier models are great until the invoice arrives. Small models are great until a messy ticket needs nuance. Routing is how you keep both truths in production.\n\nI do not route on vibes. I route on **task class**, then measure whether the cheap path is good enough.\n\n---\n\n## Split traffic by job, not by brand loyalty\n\nRough buckets that work for support / ops / internal copilots:\n\n| Job | Default model | Escalate when |\n|-----|---------------|---------------|\n| Classify / tag / extract JSON | small | schema fails twice |\n| Short FAQ with strong RAG hits | small + retrieval | low retrieval score |\n| Long reasoning, multi-doc compare | frontier | — |\n| Tool planning / agent steps | frontier or mid | tool error rate spikes |\n| Rewrite / tone polish | small | user rejects often |\n\nThe win is making the small path the default for high-volume, low-ambiguity work.\n\n---\n\n## Signals that beat \"ask the model if it is confident\"\n\nSelf-reported confidence is unreliable. Better gates:\n\n- **Retrieval score** — if top hit is weak, escalate or refuse\n- **Schema validation** — failed JSON → one retry → escalate\n- **Safety / policy flags** — skip small model for sensitive classes\n- **User / tenant tier** — paid critical workflows can pin frontier\n- **Latency SLO** — sometimes mid-tier wins on p95 even if quality is close\n\n---\n\n## Shadow before you flip the default\n\nBefore moving 70% of traffic to a smaller model:\n\n1. Shadow small-model answers offline for a week\n2. Grade against frontier on a golden set + sampled prod\n3. Compare groundedness, refusal quality, tool-call correctness\n4. Flip gradually with a kill switch\n\nIf the small model is 2% worse on a vanity metric but 60% cheaper with equal citation validity, that is usually a ship.\n\n---\n\n## Cost is a product metric\n\nTrack per feature:\n\n- $/successful task\n- Tokens in / out\n- Escalation rate to frontier\n- User thumbs-down rate by route\n\nA route that saves money but doubles escalations to humans is not a win.\n\n---\n\n## Keep prompts versioned per route\n\nSmall models need tighter prompts and stricter schemas. Do not reuse the frontier prompt and hope. Separate prompt files, separate eval suites, same CI gate pattern.\n\n---\n\n## Minimum viable router\n\n1. Classify intent with a tiny model or rules.\n2. Send easy intents to small + RAG.\n3. Send hard / unsafe / low-retrieval to frontier.\n4. Log route decisions.\n5. Review escalation rate weekly.\n\nRouting is not model worship. It is capacity planning for intelligence."
+}

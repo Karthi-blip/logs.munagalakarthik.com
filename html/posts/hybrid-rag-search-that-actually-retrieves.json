@@ -1,0 +1,15 @@
+{
+  "slug": "hybrid-rag-search-that-actually-retrieves",
+  "title": "Hybrid RAG search: sparse + dense so the right doc shows up",
+  "date": "2026-09-07",
+  "tags": [
+    "llms",
+    "rag",
+    "search",
+    "embeddings",
+    "production"
+  ],
+  "excerpt": "Dense-only retrieval misses exact IDs, error codes, and product names. Keyword-only misses paraphrases. Here is the hybrid search setup I use so RAG finds the paragraph users meant.",
+  "readTime": 6,
+  "content": "If your RAG only does vector search, it will eventually fail on the most boring queries: ticket IDs, SKU codes, exact API error strings, and \"Policy-441b.\"\n\nIf it only does keyword search, it will miss \"how do we handle refunds after 30 days?\" when the doc says \"post-purchase credit window.\"\n\nHybrid search is not fashion. It is how you cover both failure modes.\n\n---\n\n## The recipe\n\n1. **Dense retrieval** — embeddings over chunks (semantic)\n2. **Sparse retrieval** — BM25 / OpenSearch keyword (exact)\n3. **Fusion** — reciprocal rank fusion (RRF) or a learned reranker\n4. **Metadata filters** — product, locale, ACL, freshness\n5. **Rerank** top 20 → top 5 before the prompt\n\nI almost always keep a reranker. Fusion alone still leaves noisy neighbors.\n\n---\n\n## Chunking still decides your ceiling\n\nHybrid search cannot fix 2,000-token chunks that mix three policies. Prefer:\n\n- 200–500 token chunks with overlap on narrative docs\n- Smaller chunks for tables / FAQs\n- Store `title`, `section`, `updated_at`, `doc_id` as metadata\n- Keep the parent doc id so you can expand context after retrieval\n\n---\n\n## Eval like a search engineer\n\nFor each golden question, record:\n\n- Expected `doc_id` / chunk id\n- Dense hit@5, sparse hit@5, hybrid hit@5\n- Latency budget\n\nPromote index or embedding changes only when hybrid hit@5 improves without blowing p95 latency.\n\n---\n\n## Operational gotchas\n\n- **Stale dense index** after doc updates — rebuild or incremental upsert with versions\n- **Synonym gaps** — maintain a small synonym list for product language\n- **ACL after retrieval** — filter before fusion results enter the prompt\n- **Over-reranking** — rerankers add latency; cache when queries repeat\n\n---\n\n## What I tell teams stuck on \"the model hallucinated\"\n\nOften the model never saw the right paragraph. Fix retrieval first. Log the retrieved chunk IDs with every answer. If the gold doc is missing from context, that is a search bug wearing an LLM costume.\n\n---\n\n## Ship checklist\n\n- [ ] Dense + sparse retrieval both wired\n- [ ] RRF or equivalent fusion\n- [ ] Cross-encoder / rerank on the merged set\n- [ ] Hit@k dashboard on real queries\n- [ ] Index freshness SLO\n\nHybrid RAG is how you respect both the thesaurus and the ticket number."
+}
