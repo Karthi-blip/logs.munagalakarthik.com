@@ -6,6 +6,24 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://logs.munagalakarthik.com/post.html?slug=bedrock-private-access-vpc-endpoints</loc>
+    <lastmod>2026-10-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://logs.munagalakarthik.com/post.html?slug=structured-outputs-that-fail-closed</loc>
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://logs.munagalakarthik.com/post.html?slug=context-compaction-without-losing-the-thread</loc>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://logs.munagalakarthik.com/post.html?slug=agentic-rag-without-the-mess</loc>
     <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
@@ -129,6 +147,6 @@
     <loc>https://logs.munagalakarthik.com/post.html?slug=hello-world-why-i-started-logs</loc>
     <lastmod>2026-05-07</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
 </urlset>

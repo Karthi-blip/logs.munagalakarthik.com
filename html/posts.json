@@ -1,6 +1,48 @@
 {
   "posts": [
     {
+      "slug": "bedrock-private-access-vpc-endpoints",
+      "title": "Bedrock over VPC endpoints: private access without the folklore",
+      "date": "2026-10-21",
+      "tags": [
+        "aws",
+        "bedrock",
+        "vpc",
+        "cloud-security",
+        "networking"
+      ],
+      "excerpt": "\"Our models never touch the public internet\" is a claim you have to design for \u2014 not a checkbox in the console. Here is the private Bedrock path I actually wire up.",
+      "readTime": 6
+    },
+    {
+      "slug": "structured-outputs-that-fail-closed",
+      "title": "Structured outputs that fail closed",
+      "date": "2026-10-14",
+      "tags": [
+        "llms",
+        "agents",
+        "production",
+        "ai-engineering",
+        "ai-security"
+      ],
+      "excerpt": "JSON mode is not a contract. Here is how I make tool args and model responses validate hard \u2014 and what happens when the model invents a field you never offered.",
+      "readTime": 6
+    },
+    {
+      "slug": "context-compaction-without-losing-the-thread",
+      "title": "Context compaction without losing the thread",
+      "date": "2026-10-07",
+      "tags": [
+        "llms",
+        "agents",
+        "production",
+        "ai-engineering",
+        "observability"
+      ],
+      "excerpt": "Long agent sessions die in two ways: the context window fills up, or you summarize so hard the model forgets the constraint that mattered. Here is how I compact history without inventing a new conversation.",
+      "readTime": 6
+    },
+    {
       "slug": "agentic-rag-without-the-mess",
       "title": "Agentic RAG without turning retrieval into a confused intern",
       "date": "2026-09-13",
@@ -11,7 +53,7 @@
         "ai-engineering",
         "production"
       ],
-      "excerpt": "Giving a retriever an agent loop can help hard questions — or burn tokens while the model googles itself in circles. Here is how I add tool-backed retrieval without losing control.",
+      "excerpt": "Giving a retriever an agent loop can help hard questions \u2014 or burn tokens while the model googles itself in circles. Here is how I add tool-backed retrieval without losing control.",
       "readTime": 7
     },
     {
@@ -53,7 +95,7 @@
         "iam",
         "cloud-security"
       ],
-      "excerpt": "A CMK with a loose key policy is encryption theatre. Here are the mistakes I see most often — and the patterns I use so decrypt is intentional, not ambient.",
+      "excerpt": "A CMK with a loose key policy is encryption theatre. Here are the mistakes I see most often \u2014 and the patterns I use so decrypt is intentional, not ambient.",
       "readTime": 6
     },
     {
@@ -100,7 +142,7 @@
     },
     {
       "slug": "pii-redaction-before-the-model",
-      "title": "Redact PII before it hits the model — not after the incident",
+      "title": "Redact PII before it hits the model \u2014 not after the incident",
       "date": "2026-07-22",
       "tags": [
         "llms",
@@ -123,7 +165,7 @@
         "ai-security",
         "production"
       ],
-      "excerpt": "A leaked OpenAI or Bedrock credential is not a theoretical risk — it is a credit-card-shaped incident. Here is how I store, scope, and rotate model keys so one paste into a ticket does not empty the budget.",
+      "excerpt": "A leaked OpenAI or Bedrock credential is not a theoretical risk \u2014 it is a credit-card-shaped incident. Here is how I store, scope, and rotate model keys so one paste into a ticket does not empty the budget.",
       "readTime": 6
     },
     {
@@ -165,7 +207,7 @@
         "cloud-security",
         "hardening"
       ],
-      "excerpt": "Access Analyzer will drown you in noise if you treat every finding equally. Here is the short list I fix first — and the ones I deliberately defer.",
+      "excerpt": "Access Analyzer will drown you in noise if you treat every finding equally. Here is the short list I fix first \u2014 and the ones I deliberately defer.",
       "readTime": 5
     },
     {
@@ -249,7 +291,7 @@
         "detection-engineering",
         "cloud-security"
       ],
-      "excerpt": "CloudTrail tells you what happened. EventBridge tells you the moment it happens — if you can write the pattern without paging on every CI deploy.",
+      "excerpt": "CloudTrail tells you what happened. EventBridge tells you the moment it happens \u2014 if you can write the pattern without paging on every CI deploy.",
       "readTime": 6
     },
     {
@@ -263,7 +305,7 @@
         "incident-response",
         "cloud-security"
       ],
-      "excerpt": "When someone says \"something odd happened in IAM,\" you do not need a fancy SIEM on day one. CloudTrail already has the story — if you know which events to pull first.",
+      "excerpt": "When someone says \"something odd happened in IAM,\" you do not need a fancy SIEM on day one. CloudTrail already has the story \u2014 if you know which events to pull first.",
       "readTime": 6
     },
     {
@@ -294,7 +336,7 @@
         "engineering",
         "aws"
       ],
-      "excerpt": "LLM Engineer and Cloud Security Engineer—shipping model-backed features, learning agentic AI, and hardening the AWS, Kubernetes, and Ansible layers underneath. This is my corner of the internet.",
+      "excerpt": "LLM Engineer and Cloud Security Engineer\u2014shipping model-backed features, learning agentic AI, and hardening the AWS, Kubernetes, and Ansible layers underneath. This is my corner of the internet.",
       "readTime": 4
     }
   ]

@@ -1,0 +1,15 @@
+{
+  "slug": "structured-outputs-that-fail-closed",
+  "title": "Structured outputs that fail closed",
+  "date": "2026-10-14",
+  "tags": [
+    "llms",
+    "agents",
+    "production",
+    "ai-engineering",
+    "ai-security"
+  ],
+  "excerpt": "JSON mode is not a contract. Here is how I make tool args and model responses validate hard — and what happens when the model invents a field you never offered.",
+  "readTime": 6,
+  "content": "\"Return JSON\" in the prompt is a suggestion. Production needs a **schema gate**: if the payload does not validate, the side effect does not run.\n\nI have watched agents \"almost\" call `refund` with a string amount, a missing currency, and an extra `force: true` the schema never defined. Almost is how money moves.\n\n---\n\n## Schema first, prose second\n\nFor every tool and every structured response:\n\n1. Define a strict schema (required fields, enums, max lengths, number bounds).\n2. Prefer provider structured-output / tool-calling APIs over regex on free text.\n3. Validate again in *your* code before any business logic.\n4. Reject unknown fields — do not silently ignore `force`, `admin`, or `bypass`.\n\nThe second validation matters. Provider enforcement helps; your service boundary is still the source of truth.\n\n---\n\n## Fail closed, then decide\n\nOn invalid output:\n\n- **Do not** guess-fill required fields\n- **Do not** strip unknown keys and proceed if those keys look \"harmless\"\n- **Do** return a typed error to the agent loop (or to the user)\n- **Do** allow one constrained retry with the validator errors in context\n- **Do** escalate or refuse after the retry budget\n\nFail open (\"best effort parse\") is how prompt injection rides in through a bonus field.\n\n---\n\n## Separate \"chat shape\" from \"action shape\"\n\nUsers see markdown. Tools see schemas. Keep them apart:\n\n- Assistant message: prose + optional citations\n- Tool call: validated args only\n- Final API response to your backend: another schema if another system will act on it\n\nIf you let the model emit one blob that is both UX and executable intent, you will eventually execute a sentence.\n\n---\n\n## What I log\n\n- Schema name + version\n- Validation pass/fail + error paths (not raw PII)\n- Retry count and final disposition (success / refuse / escalate)\n- Tool name attempted\n\nWatch failure rate by schema version after every prompt change. Spikes mean the model and the contract drifted.\n\n---\n\n## Small models need tighter boxes\n\nRouting a classify/extract job to a small model only works if the schema is brutal and the retry path is short. Wide-open objects belong on stronger models — or not in tools at all.\n\n---\n\n## Ship checklist\n\n- [ ] Strict schemas for every tool and action response\n- [ ] App-side validation before side effects\n- [ ] Reject additionalProperties / unknown keys\n- [ ] One retry with validator feedback, then refuse\n- [ ] Eval cases: missing field, wrong type, injected extra field, enum drift\n\nStructured output is not about pretty JSON. It is about making invalid intent unexecutable."
+}

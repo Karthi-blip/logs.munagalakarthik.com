@@ -6,7 +6,28 @@
     <atom:link href="https://logs.munagalakarthik.com/feed.xml" rel="self" type="application/rss+xml"/>
     <description>Notes on LLMs, agentic AI, cloud security, and platform automation by Munagala Karthik.</description>
     <language>en-IN</language>
-    <lastBuildDate>Sun, 13 Sep 2026 00:00:00 +0530</lastBuildDate>
+    <lastBuildDate>Wed, 21 Oct 2026 00:00:00 +0530</lastBuildDate>
+    <item>
+      <title>Bedrock over VPC endpoints: private access without the folklore</title>
+      <link>https://logs.munagalakarthik.com/post.html?slug=bedrock-private-access-vpc-endpoints</link>
+      <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=bedrock-private-access-vpc-endpoints</guid>
+      <pubDate>Wed, 21 Oct 2026 00:00:00 +0530</pubDate>
+      <description>&quot;Our models never touch the public internet&quot; is a claim you have to design for — not a checkbox in the console. Here is the private Bedrock path I actually wire up.</description>
+    </item>
+    <item>
+      <title>Structured outputs that fail closed</title>
+      <link>https://logs.munagalakarthik.com/post.html?slug=structured-outputs-that-fail-closed</link>
+      <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=structured-outputs-that-fail-closed</guid>
+      <pubDate>Wed, 14 Oct 2026 00:00:00 +0530</pubDate>
+      <description>JSON mode is not a contract. Here is how I make tool args and model responses validate hard — and what happens when the model invents a field you never offered.</description>
+    </item>
+    <item>
+      <title>Context compaction without losing the thread</title>
+      <link>https://logs.munagalakarthik.com/post.html?slug=context-compaction-without-losing-the-thread</link>
+      <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=context-compaction-without-losing-the-thread</guid>
+      <pubDate>Wed, 07 Oct 2026 00:00:00 +0530</pubDate>
+      <description>Long agent sessions die in two ways: the context window fills up, or you summarize so hard the model forgets the constraint that mattered. Here is how I compact history without inventing a new conversation.</description>
+    </item>
     <item>
       <title>Agentic RAG without turning retrieval into a confused intern</title>
       <link>https://logs.munagalakarthik.com/post.html?slug=agentic-rag-without-the-mess</link>
@@ -124,7 +145,7 @@
       <link>https://logs.munagalakarthik.com/post.html?slug=prompt-injection-defenses-that-hold</link>
       <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=prompt-injection-defenses-that-hold</guid>
       <pubDate>Fri, 22 May 2026 00:00:00 +0530</pubDate>
-      <description>Most "prompt injection defenses" are wishful thinking dressed up as engineering. Here is the short list of patterns that survive a real red-team week.</description>
+      <description>Most &quot;prompt injection defenses&quot; are wishful thinking dressed up as engineering. Here is the short list of patterns that survive a real red-team week.</description>
     </item>
     <item>
       <title>EventBridge rules for IAM, without drowning on-call</title>
@@ -138,7 +159,7 @@
       <link>https://logs.munagalakarthik.com/post.html?slug=cloudtrail-first-queries-suspicious-iam</link>
       <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=cloudtrail-first-queries-suspicious-iam</guid>
       <pubDate>Thu, 14 May 2026 00:00:00 +0530</pubDate>
-      <description>When someone says "something odd happened in IAM," you do not need a fancy SIEM on day one. CloudTrail already has the story — if you know which events to pull first.</description>
+      <description>When someone says &quot;something odd happened in IAM,&quot; you do not need a fancy SIEM on day one. CloudTrail already has the story — if you know which events to pull first.</description>
     </item>
     <item>
       <title>IAM privilege escalation: patterns you'll actually see in the wild</title>
@@ -146,6 +167,13 @@
       <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=iam-privilege-escalation-patterns</guid>
       <pubDate>Sun, 10 May 2026 00:00:00 +0530</pubDate>
       <description>AWS IAM privilege escalation isn't about zero-days. It's about abusing legitimate permissions in ways the account owner didn't intend. Here are the patterns that come up most often.</description>
+    </item>
+    <item>
+      <title>Hi, I'm Karthik - LLM, Agents &amp; Cloud Security</title>
+      <link>https://logs.munagalakarthik.com/post.html?slug=hello-world-why-i-started-logs</link>
+      <guid isPermaLink="true">https://logs.munagalakarthik.com/post.html?slug=hello-world-why-i-started-logs</guid>
+      <pubDate>Thu, 07 May 2026 00:00:00 +0530</pubDate>
+      <description>LLM Engineer and Cloud Security Engineer—shipping model-backed features, learning agentic AI, and hardening the AWS, Kubernetes, and Ansible layers underneath. This is my corner of the internet.</description>
     </item>
   </channel>
 </rss>
